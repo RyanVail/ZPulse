@@ -15,6 +15,7 @@
 #define PACKED __attribute__((__packed__))
 #define UNUSED __attribute__((__unused__))
 #define ALIGN(alignment) __attribute__((aligned(alignment)))
+#define UNREACHABLE() __builtin_unreachable()
 
 typedef uint64_t u64;
 typedef int64_t i64;
