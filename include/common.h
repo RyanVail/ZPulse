@@ -1,6 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#define _USE_MATH_DEFINES
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -28,5 +29,15 @@ typedef int8_t i8;
 
 typedef float f32;
 typedef double f64;
+
+/* Fixed point values. Encodings are dependent on where it's used. */
+typedef u64 fu64;
+typedef u32 fu32;
+typedef u16 fu16;
+typedef u8 fu8;
+typedef i64 fi64;
+typedef i32 fi32;
+typedef i16 fi16;
+typedef i8 fi8;
 
 #endif

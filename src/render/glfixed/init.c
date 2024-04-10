@@ -19,9 +19,9 @@ r_init_error r_init()
 {
     // TODO: A lot of this stuff with window initializing could be done inside
     // the glfw window file.
-	glfwInit();
+    glfwInit();
 
-	glfw_window = glfwCreateWindow (
+    glfw_window = glfwCreateWindow (
         W_DEFAULT_WIDTH,
         W_DEFAULT_HEIGHT,
         W_NAME,
@@ -29,13 +29,13 @@ r_init_error r_init()
         NULL
     );
 
-	if (glfw_window == NULL)
+    if (glfw_window == NULL)
         return R_INIT_ERROR_WINDOW;
 
-	glfwMakeContextCurrent(glfw_window);
+    glfwMakeContextCurrent(glfw_window);
 
     glViewport(0, 0, W_DEFAULT_WIDTH, W_DEFAULT_HEIGHT);
-	glfwSetFramebufferSizeCallback(glfw_window, r_framebuffer_resize);
+    glfwSetFramebufferSizeCallback(glfw_window, r_framebuffer_resize);
 
     glEnable(GL_TEXTURE_2D);
 
