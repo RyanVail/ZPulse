@@ -12,8 +12,9 @@
 #define ASSERT(condition, ...) \
     if (!(condition)) { \
         fprintf(stderr, __VA_ARGS__); \
-        fflush(stderr); \
+        fprintf(stderr, "\n"); \
         fflush(stdout); \
+        fflush(stderr); \
         abort(); \
     }
 

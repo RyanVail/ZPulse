@@ -19,8 +19,6 @@ typedef struct o_2d {
     /* The id of the sprite of this object. */
     o_sprite_id_2d sprite;
 
-    // TODO: There could be another list of objects that don't have overlay
-    // colors because then this would only be 16 bytes.
     /* The color modifier applied over this object's sprite. */
     rgba8 color;
 } o_2d;

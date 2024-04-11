@@ -19,4 +19,19 @@ typedef struct f32_v2 {
  */
 f32_v2 f32_v2_rot(f32_v2 point, f32 sin, f32 cos);
 
+/**
+ * Gets the magnitude squared of a f32_v2.
+ */
+f32 f32_v2_mag_sqrd(f32_v2 a);
+
+/**
+ * Gets the magnitude of a f32_v2.
+ */
+f32 f32_v2_mag(f32_v2 a);
+
+/**
+ * Normalizes a f32_v2.
+ */
+f32_v2 f32_v2_normalize(f32_v2 a);
+
 #endif

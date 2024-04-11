@@ -16,3 +16,37 @@ f32_v2 f32_v2_rot(f32_v2 point, f32 sin, f32 cos)
         .y = point.x * sin + point.y * cos,
     };
 }
+
+/**
+ * Gets the magnitude squared of a f32_v2.
+ */
+f32 f32_v2_mag_sqrd(f32_v2 a)
+{
+    return (a.x * a.x) + (a.y * a.y);
+}
+
+/**
+ * Gets the magnitude of a f32_v2.
+ */
+f32 f32_v2_mag(f32_v2 a)
+{
+    return hypotf(a.x, a.y);
+}
+
+/**
+ * Normalizes a f32_v2.
+ */
+f32_v2 f32_v2_normalize(f32_v2 a)
+{
+    // TODO: Make sure this optimized into an inv sqrt.
+    const f32 mag = f32_v2_mag(a);
+
+    /* Making sure there isn't a division by zero. */
+    if (mag == 0.0)
+        return (f32_v2) { 0, 0 };
+
+    return (f32_v2) {
+        .x = a.x / mag,
+        .y = a.y / mag,
+    };
+}

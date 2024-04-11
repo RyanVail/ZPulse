@@ -1,5 +1,7 @@
-#ifndef INPUT_MAP_MOUSE_H
-#define INPUT_MAP_MOUSE_H
+#ifndef INPUT_MOUSE_H
+#define INPUT_MOUSE_H
+
+#include <math/f32_v2.h>
 
 /* Holds input from a mouse. */
 typedef struct i_mouse {
