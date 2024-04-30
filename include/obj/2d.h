@@ -18,9 +18,6 @@ typedef struct o_2d {
 
     /* The id of the sprite of this object. */
     o_sprite_id_2d sprite;
-
-    /* The color modifier applied over this object's sprite. */
-    rgba8 color;
 } o_2d;
 
 /**
@@ -42,6 +39,16 @@ f32 o_2d_rot_sin(const o_2d* obj);
  * Calculates the cos of a 2D object's rotation.
  */
 f32 o_2d_rot_cos(const o_2d* obj);
+
+/**
+ * Converts the x cord of a 2D object's size into a f32.
+ */
+f32 o_2d_size_x(const o_2d* obj);
+
+/**
+ * Converts the y cord of a 2D object's size into a f32.
+ */
+f32 o_2d_size_y(const o_2d* obj);
 
 /**
  * Converts a 2D object's size into a f32_v2.

@@ -16,11 +16,11 @@ void r_flush();
 /**
  * Renders a 2D object.
  */
-void r_obj2d(const o_2d* obj);
+void r_obj_2d(const o_2d* obj);
 
 /**
  * Renders all the 2D objects in the global 2D object list.
  */
-void r_objs2d();
+void r_objs_2d();
 
 #endif

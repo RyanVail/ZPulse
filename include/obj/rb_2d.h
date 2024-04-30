@@ -3,12 +3,14 @@
 
 #include <obj/2d.h>
 #include <math/vectors.h>
+#include <phys/mat.h>
 
+// TODO: There should be asserts somewhere to make sure these are all 32 bytes.
+// TODO: If this isn't required remove it.
 /* The type of a 2D rigid body. */
 typedef enum PACKED o_rb_2d_type {
-    O_RB_2D_CIRCLE,
     O_RB_2D_RECT,
-    O_RB_2D_AABB,
+    O_RB_2D_CIRCLE,
 } o_rb_2d_type;
 
 /* A 2D object's rigid body. */
@@ -19,38 +21,59 @@ typedef struct o_rb_2d {
     /* The velocity of this rigid body. */
     f32_v2 vel;
 
+    /* The angular velocity of this rigid body. */
+    f32 ang_vel;
+
     /* The inverse mass of this rigid body. */
-    f32 inv_mass;
+    fu16 inv_mass;
+
+    /* The id of the physics material of this rigid body. */
+    pe_mat_id mat;
 } o_rb_2d;
 
-/* A 2D object's rigid body with a circle based collider. */
-typedef struct o_rb_2d_circle {
-    /* The parent rigid body. */
-    o_rb_2d rb;
+/* A 2D object's rigid body with a rectangle collider. */
+typedef o_rb_2d o_rb_2d_rect;
 
-    /* The radius of the circle. */
-    f32 radius;
-} o_rb_2d_circle;
+/* A 2D object's rigid body with a circle collider. */
+typedef o_rb_2d o_rb_2d_circle;
 
-/* A 2D object's rigid body with a rectangle based collider. */
-typedef struct o_rb_2d_rect {
-    /* The parent rigid body. */
-    o_rb_2d rb;
+/**
+ * Gets the physics material of a 2D rigid body.
+ */
+const pe_mat* o_rb_2d_mat(const o_rb_2d* rb);
 
-    /* The size of the rectangle. */
-    fu16_v2 size;
-} o_rb_2d_rect;
+/**
+ * Gets the radius of a 2D circle rigid body.
+ */
+f32 o_rb_2d_circle_radius(const o_rb_2d* rb);
 
-/* A 2D object's rigid body with an aabb based collider. */
-typedef struct o_rb_2d_aabb {
-    /* The parent rigid body. */
-    o_rb_2d rb;
+/**
+ * Ticks a 2D rigid body.
+ */
+void o_rb_2d_tick(o_rb_2d* rb);
 
-    /* The minimum of the aabb. */
-    fu16_v2 min;
-    
-    /* The maximum of the aabb. */
-    fu16_v2 max;
-} o_rb_2d_aabb;
+/**
+ * Ticks a rectangle 2D rigid body.
+ */
+void o_rb_2d_rect_tick(o_rb_2d_rect* rect);
+
+/**
+ * Ticks a circle 2D rigid body.
+ */
+void o_rb_2d_circle_tick(o_rb_2d_circle* circle);
+
+/**
+ * Applies a force to a 2D rigid body.
+ */
+void o_rb_2d_apply_force (
+    o_rb_2d* rb,
+    f32 inv_inertia,
+    f32_v2 force_vec,
+    f32_v2 contact_vec );
+
+/**
+ * Gets the inverse mass of a 2D rigid body.
+ */
+f32 o_rb_2d_inv_mass(const o_rb_2d* rb);
 
 #endif

@@ -1,36 +1,23 @@
 #include <game/game.h>
+#include <game/obj_2d.h>
+#include <game/rb_2d.h>
+#include <utils/vector.h>
 #include <player/player.h>
 
-// TODO: These should be moved into another file like game/obj_2d.c.
-typeof(objs_2d) objs_2d;
-
+// TODO: It may make more sense if this was moved into game/player.c
 /* The global local player list. */
-static VEC(p_player) local_players;
+static VEC(p_player) g_local_players;
 
+// TODO: This could be moved to game/init.c.
 /**
  * Inits the game.
  */
 void g_init()
 {
-    VEC_INIT(objs_2d, 1024);
-    VEC_INIT(local_players, 8);
-}
-
-/**
- * Adds a 2D object to the global 2D object list.
- */
-o_2d* g_add_obj2d(const o_2d* obj)
-{
-    VEC_APPEND(objs_2d, obj);
-    return &VEC_AT(objs_2d, objs_2d.len - 1);
-}
-
-/**
- * Removes a 2D object from the global 2D object list.
- */
-void g_remove_obj2d(o_2d* obj)
-{
-    VEC_REMOVE_PTR(objs_2d, obj);
+    VEC_INIT(g_objs_2d, G_OBJ_2D_INIT_LEN);
+    VEC_INIT(g_local_players, G_LOCAL_PLAYERS_INIT_LEN);
+    VEC_INIT(g_rb_2d_rects, G_RB_2D_INIT_LEN);
+    VEC_INIT(g_rb_2d_circles, G_RB_2D_INIT_LEN);
 }
 
 /**
@@ -38,7 +25,7 @@ void g_remove_obj2d(o_2d* obj)
  */
 p_player* g_add_player()
 {
-    p_player* player = VEC_DRY_APPEND(local_players);
+    p_player* player = VEC_DRY_APPEND(g_local_players);
     memset(player, 0, sizeof(p_player));
     return player;
 }
@@ -48,6 +35,6 @@ p_player* g_add_player()
  */
 void g_tick_players()
 {
-    for VEC_ITER(local_players, player)
+    for VEC_ITER(g_local_players, player)
         p_tick(player);
 }

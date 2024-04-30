@@ -1,7 +1,8 @@
 #include <libs/glfw.h>
 #include <render/render.h>
 #include <window/glfw.h>
-#include <game/game.h>
+#include <game/obj_2d.h>
+#include <game/rb_2d.h>
 
 /**
  * Clears the render buffer.
@@ -25,7 +26,7 @@ void r_flush()
 /**
  * Renders a 2D object.
  */
-void r_obj2d(const o_2d* obj)
+void r_obj_2d(const o_2d* obj)
 {
     /* Used to rotate the points around based on the objects rotation. */
     const f32 s = o_2d_rot_sin(obj);
@@ -66,10 +67,15 @@ void r_obj2d(const o_2d* obj)
 }
 
 /**
- * Renders all the 2D objects in the global 2D object list.
+ * Renders all the 2D objects in the global 2D object list and all the objects
+ * of the rigid bodies in the 2D global object lists.
  */
-void r_objs2d()
+void r_objs_2d()
 {
-    for OBJS_2D_ITER(obj)
-        r_obj2d(obj);
+    for VEC_ITER(g_objs_2d, obj)
+        r_obj_2d(obj);
+    for VEC_ITER(g_rb_2d_rects, obj)
+        r_obj_2d(&obj->obj);
+    for VEC_ITER(g_rb_2d_circles, obj)
+        r_obj_2d(&obj->obj);
 }

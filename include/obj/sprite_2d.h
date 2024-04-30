@@ -20,6 +20,7 @@ typedef struct o_sprite_2d {
     rgba8 color;
 } o_sprite_2d;
 
+// TODO: Should this be in the init.c file?
 /**
  * Inits the 2D sprites list.
  */

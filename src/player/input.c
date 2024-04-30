@@ -62,8 +62,8 @@ f32_v2 p_normalize_move_input(const p_player* player)
 {
     /* Combinding the opposite move directions. */
     f32_v2 move = {
-        player->move_input[0] - player->move_input[1],
         player->move_input[2] - player->move_input[3],
+        player->move_input[0] - player->move_input[1],
     };
 
     // TODO: This won't allow controller players to walk very slowly forward,

@@ -1,4 +1,71 @@
 #include <math/f32_v2.h>
+#include <math/f32.h>
+
+/**
+ * Create a f32_v2 with all it's elements being a.
+ */
+f32_v2 f32_v2_splat(f32 a)
+{
+    return (f32_v2) {
+        .x = a,
+        .y = a
+    };
+}
+
+/**
+ * Gets the negative of a f32_v2.
+ */
+f32_v2 f32_v2_neg(f32_v2 a)
+{
+    return (f32_v2) {
+        .x = -a.x,
+        .y = -a.y,
+    };
+}
+
+/**
+ * Add two f32_v2 together. 
+ */
+f32_v2 f32_v2_add(f32_v2 a, f32_v2 b)
+{
+    return (f32_v2) {
+        .x = a.x + b.x,
+        .y = a.y + b.y,
+    };
+}
+
+/**
+ * Subtracted a f32_v2 from another f32_v2.
+ */
+f32_v2 f32_v2_sub(f32_v2 a, f32_v2 b)
+{
+    return (f32_v2) {
+        .x = a.x - b.x,
+        .y = a.y - b.y,
+    };
+}
+
+/**
+ * Multipies a f32_v2 by another f32_v2.
+ */
+f32_v2 f32_v2_mul(f32_v2 a, f32_v2 b)
+{
+    return (f32_v2) {
+        .x = a.x * b.x,
+        .y = a.y * b.y,
+    };
+}
+
+/**
+ * Divide a f32_v2 by another f32_v2.
+ */
+f32_v2 f32_v2_div(f32_v2 a, f32_v2 b)
+{
+    return (f32_v2) {
+        .x = a.x / b.x,
+        .y = a.y / b.y,
+    };
+}
 
 /**
  * Rotates a point represented by a f32_v2 around the origin based on the sin
@@ -48,5 +115,16 @@ f32_v2 f32_v2_normalize(f32_v2 a)
     return (f32_v2) {
         .x = a.x / mag,
         .y = a.y / mag,
+    };
+}
+
+/**
+ * Clamps a f32_v2 between a minimum and maximum.
+ */
+f32_v2 f32_v2_clamp(f32_v2 a, f32_v2 min, f32_v2 max)
+{
+    return (f32_v2) {
+        .x = f32_clamp(a.x, min.x, max.x),
+        .y = f32_clamp(a.y, min.y, max.y),
     };
 }
