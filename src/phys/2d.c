@@ -105,10 +105,7 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
 
     /* The combined squared radi of the circles. */
     const f32 radius_sqrd = powf (
-        o_rb_2d_circle_radius(c0),
-        2
-    ) + powf (
-        o_rb_2d_circle_radius(c1),
+        o_rb_2d_circle_radius(c0) + o_rb_2d_circle_radius(c1),
         2
     );
 
@@ -128,7 +125,7 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
     normal = f32_v2_mul(normal, f32_v2_splat(1.0f / sqrtf(dist_sqrd)));
 
     /* The point of the collision. */
-    f32_v2 pos = f32_v2_add (
+    const f32_v2 pos = f32_v2_add (
         c0->obj.pos,
         f32_v2_mul(normal, f32_v2_splat(o_rb_2d_circle_radius(c0)))
     );
@@ -152,7 +149,7 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
         }
     ));
 
-    const f32 vel_along_norm = vel.x * normal.x + vel.y * normal.y;
+    const f32 vel_along_norm = (vel.x * normal.x) + (vel.y * normal.y);
 
     /* Don't do anything if the objects are seperating. */
     if (vel_along_norm > 0)
@@ -163,15 +160,15 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
 
     const f32 restitution = fmin(mat0->restitution, mat1->restitution);
 
-    const f32 p0_cross = p0.x * normal.y - p0.y * normal.x;
-    const f32 p1_cross = p1.x * normal.y - p1.y * normal.x;
+    const f32 p0_cross = (p0.x * normal.y) - (p0.y * normal.x);
+    const f32 p1_cross = (p1.x * normal.y) - (p1.y * normal.x);
 
-    const f32 mass = (f32) (
+    const f32 inv_mass = (f32) (
         (u32)c0->inv_mass + (u32)c1->inv_mass
     ) / (1 << 11);
     
     f32 force = -(1 + restitution) * vel_along_norm;
-    force /= mass + (p0_cross * p0_cross) * mat0->inv_inertia
+    force /= inv_mass + (p0_cross * p0_cross) * mat0->inv_inertia
         + (p1_cross * p1_cross) * mat1->inv_inertia;
 
     const f32_v2 force_vec = f32_v2_mul(normal, f32_v2_splat(force));

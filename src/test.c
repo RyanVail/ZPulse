@@ -21,7 +21,7 @@ void p_tick(p_player* player)
     p_input(player);
     o_rb_2d* rb = player->obj;
 
-    #define ACCEL_SPEED 0.0175f
+    #define ACCEL_SPEED 0.0225f
     #define MAX_SPEED 0.038f
     f32_v2 move = p_normalize_move_input(player);
 
@@ -30,7 +30,7 @@ void p_tick(p_player* player)
         f32_v2_mul (
             move,
             (f32_v2) {
-                .x = ACCEL_SPEED * W_RATIO,
+                .x = ACCEL_SPEED,
                 .y = ACCEL_SPEED,
             }
         )
@@ -67,7 +67,7 @@ int main()
     u32 height;
     UNUSED u32 channels;
     u8* raw = stbi_load (
-        "tests/test.tga",
+        "../tests/test.tga",
         (i32*)&width,
         (i32*)&height,
         (i32*)&channels,
@@ -111,16 +111,17 @@ int main()
     const pe_mat player_mat = {
         .air_res = 0.5,
         .restitution = 0.2,
-        .inv_inertia = 1.0f / 0.25f,
+        .inv_inertia = 1.0f / 5.0f,
     };
 
-    pe_mat_id player_mat_id = pe_add_mat(&player_mat);
+    const pe_mat_id player_mat_id = pe_add_mat(&player_mat);
 
     o_rb_2d_circle* player_circle = VEC_DRY_APPEND(g_rb_2d_circles);
     memcpy(player_circle, &rb, sizeof(rb));
     player_circle->ang_vel = 0.0f;
     player_circle->mat = player_mat_id;
     player_circle->vel = (f32_v2) { 0, 0 };
+    player_circle->inv_mass = 50;
 
     p_player* player = g_add_player();
     player->obj = player_circle;

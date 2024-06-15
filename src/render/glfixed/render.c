@@ -52,16 +52,16 @@ void r_obj_2d(const o_2d* obj)
 
     /* Rendering the vertices. */
     glTexCoord2i(0, 0);
-    glVertex2f(obj->pos.x + p0.x, obj->pos.y + p0.y);
+    glVertex2f(obj->pos.x * W_RATIO + p0.x, obj->pos.y + p0.y);
 
     glTexCoord2i(1, 0);
-    glVertex2f(obj->pos.x + p1.x, obj->pos.y + p1.y);
+    glVertex2f(obj->pos.x * W_RATIO + p1.x, obj->pos.y + p1.y);
 
     glTexCoord2i(1, 1);
-    glVertex2f(obj->pos.x - p0.x, obj->pos.y - p0.y);
+    glVertex2f(obj->pos.x * W_RATIO - p0.x, obj->pos.y - p0.y);
 
     glTexCoord2i(0, 1);
-    glVertex2f(obj->pos.x - p1.x, obj->pos.y - p1.y);
+    glVertex2f(obj->pos.x * W_RATIO - p1.x, obj->pos.y - p1.y);
 
     glEnd();
 }

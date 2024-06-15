@@ -71,8 +71,9 @@ void o_rb_2d_apply_force (
         f32_v2_splat(o_rb_2d_inv_mass(rb))
     );
 
-    f32 d = contact_vec.x * force_vec.y - contact_vec.y * force_vec.x;
-    rb->ang_vel += d / inv_inertia;
+    rb->ang_vel += inv_inertia * (
+        (contact_vec.x * force_vec.y) + (contact_vec.y * force_vec.x)
+    );
 }
 
 /**
