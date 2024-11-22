@@ -8,6 +8,8 @@
 
 /* Types of input processors. */
 typedef enum i_type {
+    // TODO: This should probably be named mouse_and_keyboard because that's
+    // more commonly said.
     I_KEYBOARD_AND_MOUSE,
     I_CONTROLLER,
 } i_type;

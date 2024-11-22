@@ -14,6 +14,11 @@ typedef struct f32_v2 {
 f32_v2 f32_v2_splat(f32 a);
 
 /**
+ * Create a f32_v2 with all it's elements being 0.
+ */
+f32_v2 f32_v2_zero();
+
+/**
  * Gets the negative of a f32_v2.
  */
 f32_v2 f32_v2_neg(f32_v2 a);
@@ -68,5 +73,10 @@ f32_v2 f32_v2_normalize(f32_v2 a);
  * Clamps a f32_v2 between a minimum and maximum.
  */
 f32_v2 f32_v2_clamp(f32_v2 a, f32_v2 min, f32_v2 max);
+
+/**
+ * Checks if all elements in a f32_v2 are zeros.
+ */
+bool f32_v2_is_zero(f32_v2 a);
 
 #endif

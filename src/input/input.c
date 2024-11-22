@@ -14,8 +14,7 @@ void i_read(i_input* processor)
     {
     case I_KEYBOARD_AND_MOUSE:
         i_keyboard_read(&processor->processor.keyboard_and_mouse.keyboard);
-        // TODO: Add mouse input here.
-        //i_mouse_read(processor->processor.keyboard_and_mouse.mouse);
+        i_mouse_read(&processor->processor.keyboard_and_mouse.mouse);
         break;
     case I_CONTROLLER:
         // TODO: Controller read.

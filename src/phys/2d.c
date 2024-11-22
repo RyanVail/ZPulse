@@ -1,5 +1,7 @@
 #include <game/rb_2d.h>
 #include <phys/2d.h>
+#include <phys/grid.h>
+#include <math/u32.h>
 
 // TODO: All this has to do to check if a pair was already check is to just
 // check if the found index of the same type of rb is lower than the current
@@ -66,20 +68,39 @@ void pe_2d_init()
  */
 void pe_find_circle_circle_pairs()
 {
+#if 0
     if (g_rb_2d_circles.len == 0)
         return;
 
+    /* Adding the pairs to the global pair list. */
     for (size_t i = 0; i < g_rb_2d_circles.len - 1; i++) {
-        // TODO: This only needs to start at i actually.
-        for (size_t j = 0; j < g_rb_2d_circles.len; j++) {
-            /* If this pair has already been added. */
-            if (j <= i)
-                continue;
-
-            /* Adding the pair to the global pair list. */
+        for (size_t j = i + 1; j < g_rb_2d_circles.len; j++) {
             pe_circle_circle_pair_2d* pair = (void*)VEC_DRY_APPEND(pe_pairs_2d);
             pair->circle_index = i;
             pair->other_circle_index = j;
+        }
+    }
+
+    /* Setting the index in p_pairs_2d where dual circle pairs end. */
+    pe_circle_circle_end = pe_pairs_2d.len;
+#endif
+    // TODO: Is there a better way to iterate?
+    for (size_t i = 0; i < ARRAY_LEN(pe_grid.divisions); i++) {
+        u32 obj = pe_grid.divisions[i];
+        if (obj == UINT32_MAX || VEC_AT(pe_grid.objs, obj).next == UINT32_MAX)
+            continue;
+
+        for (; obj != UINT32_MAX; obj = VEC_AT(pe_grid.objs, obj).next) {
+            for (u32 _obj = VEC_AT(pe_grid.objs, obj).next;
+            _obj != UINT32_MAX;
+            _obj = VEC_AT(pe_grid.objs, _obj).next) {
+                pe_circle_circle_pair_2d* pair = (void*)VEC_DRY_APPEND (
+                    pe_pairs_2d
+                );
+
+                pair->circle_index = VEC_AT(pe_grid.objs, obj).rb & u32_mask_bits(31);
+                pair->other_circle_index = VEC_AT(pe_grid.objs, _obj).rb & u32_mask_bits(31);
+            }
         }
     }
 
@@ -96,7 +117,7 @@ void pe_find_pairs()
 }
 
 /**
- * Solve the possible collision of two 2D circle rigid bodies.
+ * Solves the possible collision of two 2D circle rigid bodies.
  */
 void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
 {
@@ -117,9 +138,15 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
     /* The squared distance between the circles. */
     const f32 dist_sqrd = f32_v2_mag_sqrd(normal);
 
-    /* If the circles are not colliding. */
-    if (radius_sqrd < dist_sqrd)
-        return;
+    /* If the circles are already colliding without scaling. */
+    if (radius_sqrd > dist_sqrd)
+        goto solve;
+
+    /* If there was no collision. */
+    return;
+
+    /* Solves the collision. */
+    solve:
 
     // TODO: Make sure this becomes a inv sqrt.
     normal = f32_v2_mul(normal, f32_v2_splat(1.0f / sqrtf(dist_sqrd)));
@@ -192,8 +219,11 @@ void pe_solve_circle_circle_pairs()
 void pe_solve()
 {
     pe_solve_circle_circle_pairs();
+
+    // TODO: This should use some smart algorithm to determine if this should
+    // shrink of not.
     pe_pairs_2d.len = 0;
-    VEC_SHRINK(pe_pairs_2d);
+    //VEC_SHRINK(pe_pairs_2d);
 }
 
 /**

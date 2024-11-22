@@ -8,8 +8,16 @@ f32_v2 f32_v2_splat(f32 a)
 {
     return (f32_v2) {
         .x = a,
-        .y = a
+        .y = a,
     };
+}
+
+/**
+ * Create a f32_v2 with all it's elements being 0.
+ */
+f32_v2 f32_v2_zero()
+{
+    return f32_v2_splat(0.0f);
 }
 
 /**
@@ -127,4 +135,12 @@ f32_v2 f32_v2_clamp(f32_v2 a, f32_v2 min, f32_v2 max)
         .x = f32_clamp(a.x, min.x, max.x),
         .y = f32_clamp(a.y, min.y, max.y),
     };
+}
+
+/**
+ * Checks if all elements in a f32_v2 are zeros.
+ */
+bool f32_v2_is_zero(f32_v2 a)
+{
+    return a.x == 0.0f && a.y == 0.0f;
 }

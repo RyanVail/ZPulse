@@ -12,7 +12,7 @@
                                // to be reversed.
 
 /* Input settings. */
-#define I_MOUSE_BUTTONS 5
+#define I_MOUSE_BUTTONS 8
 
 /* Game engine settings. */
 #define MULTITHREADED true
@@ -26,5 +26,36 @@
 #define PE_DEFAULT_AIR_RES 0.02f
 #define PE_DEFAULT_RESTITUTION 0.85f
 #define PE_DEFAULT_INERTIA 5.0f
+#define PE_DEFAULT_INV_MASS 8192
+#define PE_DEFAULT_POS { 0.0f, 0.0f }
+#define PE_DEFAULT_SCALE { 16, 16 }
+#define PE_DEFAULT_ROT 0
+#define PE_DEFAULT_VEL { 0.0f, 0.0f }
+#define PE_DEFAULT_ANG_VEL 0.0f
+
+/* The size of the physics grid. */
+#define PE_GRID_SIZE 256
+
+/*
+ * The number of divisions the grid is split into for collision detection in
+ * powers of two.
+ */
+#define PE_GRID_DIVISIONS 10
+
+/* Rendering settings. */
+#define R_SPRITE_DEFAULT_SHAPE R_SHAPE_CIRCLE
+#define R_SPRITE_DEFAULT_TEX 0
+#define R_SPRITE_DEFAULT_FILTER R_TEX_FILTER_NONE
+#define R_SPRITE_DEFAULT_COLOR { 0, 0, 0, 0 }
+
+/* Fixed render settings. */
+#define R_CIRCLE_POINTS 32
+#define R_CIRCLE_ROTATION true
+#define R_LINE_THICKNESS 0.05f
+
+/* Making sure the circle points are valid. */
+#if (R_CIRCLE_POINTS & 1) != 0 || R_CIRCLE_POINTS <= 2
+    #error "Invalid cirlce render points"
+#endif
 
 #endif

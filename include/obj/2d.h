@@ -7,6 +7,7 @@
 
 /* A 2D object. */
 typedef struct o_2d {
+    // TODO: Positions should actually be u32s.
     /* The position of this object. */
     f32_v2 pos;
 
@@ -16,6 +17,8 @@ typedef struct o_2d {
     /* The rotation of this object. */
     fu16 rot;
 
+    // TODO: Try to move this out of the memory of the object to see if that
+    // makes this faster.
     /* The id of the sprite of this object. */
     o_sprite_id_2d sprite;
 } o_2d;
@@ -26,9 +29,19 @@ typedef struct o_2d {
 r_tex o_2d_tex(const o_2d* obj);
 
 /**
+ * Gets the sprite of a 2D object.
+ */
+const o_sprite_2d* o_2d_sprite(const o_2d* obj);
+
+/**
  * Gets the color of a 2D object.
  */
 rgba8 o_2d_color(const o_2d* obj);
+
+/**
+ * Calculates the angle of a 2D object.
+ */
+f32 o_2d_ang(const o_2d* obj);
 
 /**
  * Calculates the sin of a 2D object's rotation.

@@ -4,13 +4,14 @@
 #include <obj/2d.h>
 #include <math/vectors.h>
 #include <phys/mat.h>
+#include <assert.h>
 
 // TODO: There should be asserts somewhere to make sure these are all 32 bytes.
 // TODO: If this isn't required remove it.
 /* The type of a 2D rigid body. */
 typedef enum PACKED o_rb_2d_type {
-    O_RB_2D_RECT,
-    O_RB_2D_CIRCLE,
+    O_RB_2D_RECT = 0,
+    O_RB_2D_CIRCLE = 1,
 } o_rb_2d_type;
 
 /* A 2D object's rigid body. */
@@ -30,6 +31,9 @@ typedef struct o_rb_2d {
     /* The id of the physics material of this rigid body. */
     pe_mat_id mat;
 } o_rb_2d;
+
+/* Perf oriented code relies on this being 32 bytes. */
+static_assert(sizeof(o_rb_2d) == 32, "The size of o_rb_2d isn't 32 bytes.");
 
 /* A 2D object's rigid body with a rectangle collider. */
 typedef o_rb_2d o_rb_2d_rect;

@@ -33,19 +33,25 @@ typedef enum i_key {
     I_KEY_Y,
     I_KEY_Z,
 
-    I_KEY_ENUM_MAX,
+    #define I_KEYS (I_KEY_Z + 1)
 } i_key;
 
 /* Holds input from a keyboard. */
 typedef struct i_keyboard {
-    /* The commands each key is mapped to. */
-    c_command map[I_KEY_ENUM_MAX];
+    /* Commands that activate when keys are first pressed. */
+    c_command press_map[I_KEYS];
+
+    /* Commands that activate when keys are being pressed. */
+    c_command hold_map[I_KEYS];
+
+    /* Commands that activate when keys stop being pressed. */
+    c_command unpress_map[I_KEYS];
 
     /* The buttons on the keyboard currently being pressed. */
-    bool keys[I_KEY_ENUM_MAX];
+    bool keys[I_KEYS];
 
     /* The buttons on the keyboard that were being pressed the last poll. */
-    bool last_keys[I_KEY_ENUM_MAX];
+    bool last_keys[I_KEYS];
 } i_keyboard;
 
 /**
@@ -55,7 +61,7 @@ void i_keyboard_read(i_keyboard* keyboard);
 
 /**
  * Saves the current input from a keyboard into the last input of the
- * controller.
+ * keyboard.
  */
 void i_keyboard_save_last_keys(i_keyboard* keyboard);
 

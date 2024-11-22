@@ -12,11 +12,26 @@ typedef enum PACKED c_command {
     C_NONE = 0,
 
     /* Player only commands. */
-    C_FORWARD,
-    C_BACKWARD,
-    C_LEFT,
-    C_RIGHT,
-    C_JUMP,
+    CS_FORWARD,
+    CE_FORWARD,
+
+    CS_BACKWARD,
+    CE_BACKWARD,
+
+    CS_LEFT,
+    CE_LEFT,
+
+    CS_RIGHT,
+    CE_RIGHT,
+
+    CS_JUMP,
+    CE_JUMP,
+
+    CS_PRIMARY_ATTACK,
+    CE_PRIMARY_ATTACK,
+
+    CS_SECONDARY_ATTACK,
+    CE_SECONDARY_ATTACK,
 } c_command;
 
 /**

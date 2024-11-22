@@ -1,4 +1,5 @@
-#include<obj/rb_2d.h>
+#include <obj/rb_2d.h>
+#include <phys/grid.h>
 
 /**
  * Gets the physics material of a 2D rigid body.
@@ -21,13 +22,25 @@ f32 o_rb_2d_circle_radius(const o_rb_2d* rb)
  */
 void o_rb_2d_tick(o_rb_2d* rb)
 {
-    rb->obj.pos = f32_v2_add(rb->obj.pos, rb->vel);
-
-    // TODO: This should be based on the object's physics material.
     const pe_mat* mat = o_rb_2d_mat(rb);
-    rb->vel = f32_v2_mul(rb->vel, f32_v2_splat(1.0f - mat->air_res));
-    rb->obj.rot += (fu16)(rb->ang_vel * 65536.0f);
-    rb->ang_vel *= 1.0f - mat->air_res;
+
+    /* Ticking the angular vel of this rigid body. */
+    if (rb->ang_vel != 0.0f) {
+        rb->obj.rot += (fu16)(rb->ang_vel * 65536.0f);
+        rb->ang_vel *= 1.0f - mat->air_res;
+    }
+
+    /* Ticking the vel of this rigid body. */
+    if (!f32_v2_is_zero(rb->vel)) {
+        const u32 old_grid_divison = pe_grid_division(rb->obj.pos);
+        rb->obj.pos = f32_v2_add(rb->obj.pos, rb->vel);
+        rb->vel = f32_v2_mul(rb->vel, f32_v2_splat(1.0f - mat->air_res));
+
+        /* Readding this object to the grid if it moved grid divisions. */
+        const u32 new_grid_divison = pe_grid_division(rb->obj.pos);
+        if (new_grid_divison != old_grid_divison)
+            pe_grid_rb_2d_move(rb, old_grid_divison, new_grid_divison);
+    }
 }
 
 /**
@@ -44,15 +57,6 @@ void o_rb_2d_rect_tick(o_rb_2d_rect* rect)
 void o_rb_2d_circle_tick(o_rb_2d_circle* circle)
 {
     o_rb_2d_tick((o_rb_2d*)circle);
-
-    // TODO: TMP!
-    #if 0
-    circle->rb.obj.pos = f32_v2_clamp (
-        circle->rb.obj.pos,
-        (f32_v2) { -1 + circle->radius_sqrd * 12, -1 + circle->radius_sqrd * 12 },
-        (f32_v2) { 1 - circle->radius_sqrd * 12, 1 - circle->radius_sqrd * 12 }
-    );
-    #endif
 }
 
 // TODO: Rename the inputs of this function to make more sense and document it
@@ -66,9 +70,15 @@ void o_rb_2d_apply_force (
     f32_v2 force_vec,
     f32_v2 contact_vec )
 {
-    rb->vel = f32_v2_mul (
-        f32_v2_add(rb->vel, force_vec),
-        f32_v2_splat(o_rb_2d_inv_mass(rb))
+    if (rb->inv_mass == 0)
+        return;
+
+    rb->vel = f32_v2_add (
+        rb->vel,
+        f32_v2_mul (
+            force_vec,
+            f32_v2_splat(o_rb_2d_inv_mass(rb))
+        )
     );
 
     rb->ang_vel += inv_inertia * (

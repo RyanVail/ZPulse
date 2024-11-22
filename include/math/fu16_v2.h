@@ -8,4 +8,9 @@ typedef struct fu16_v2 {
     fu16 y;
 } fu16_v2;
 
+/**
+ * Create a fu16_v2 with all it's elements being a.
+ */
+fu16_v2 fu16_v2_splat(fu16 a);
+
 #endif

@@ -13,6 +13,8 @@
 
 #include <settings.h>
 
+#define ARRAY_LEN(array) (sizeof(array) / sizeof((array)[0]))
+
 #define PACKED __attribute__((__packed__))
 #define UNUSED __attribute__((__unused__))
 #define ALIGN(alignment) __attribute__((aligned(alignment)))

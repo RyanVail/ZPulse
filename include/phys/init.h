@@ -16,4 +16,9 @@ void pe_2d_init();
  */
 void pe_mat_init();
 
+/**
+ * Inits the physics engine's grid.
+ */
+void pe_grid_init();
+
 #endif

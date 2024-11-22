@@ -1,4 +1,5 @@
 #include <utils/vector.h>
+#include <math/u32.h>
 
 /**
  * Get a value from a vector at an index. This can compile with bounds checks
@@ -252,4 +253,46 @@ void vector_init(vector* vec, size_t len, size_t type_size)
         .len = 0,
         .size = (u8)size,
     };
+}
+
+/**
+ * Checks if a pointer points to a value within the data of a vector.
+ *
+ * @param vec The vector to check if the pointer is within.
+ * @param ptr The pointer to check if inside the vector.
+ * @param type_size The byte size of each element in the vector.
+ * @return True if the pointer points to data inside the vector, otherwise
+ * false.
+ *
+ * @warning Use "VEC_PTR_WITHIN".
+ */
+bool vector_is_ptr_within(vector* vec, const void* ptr, size_t type_size)
+{
+    return ((uintptr_t)ptr >= (uintptr_t)vec->data) 
+        && (uintptr_t)ptr < (uintptr_t)(vec->data + (vec->len * type_size));
+}
+
+/**
+ * Gets the data index of a pointer that points inside a vector.
+ *
+ * @param vec The vector the pointer points inside of.
+ * @param ptr The pointer to get the data index of.
+ * @param type_size The byte size of each element in the vector.
+ * @return The index of the data inside the vector the pointer points to.
+ *
+ * @warning Use "VEC_PTR_INDEX".
+ */
+size_t vector_ptr_index(vector* vec, const void* ptr, size_t type_size)
+{
+    DEBUG_ASSERT (vector_is_ptr_within(vec, ptr, type_size),
+        "Tried to get the data index of a pointer within a vector that "
+        "doesn't point to data within the vector."
+    );
+    
+    DEBUG_ASSERT (((uintptr_t)ptr & u32_mask_bits((u32)type_size)) == 0,
+        "Tried to get the data index of a pointer within a vector that isn't "
+        "aligned to the type size of the data within the vector."
+    );
+
+    return ((uintptr_t)ptr - (uintptr_t)vec->data) / type_size;
 }

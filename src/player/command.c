@@ -18,17 +18,41 @@ void p_execute(p_player* player, c_command command)
     case C_NONE:
         break;
 
-    case C_FORWARD:
-    case C_BACKWARD:
-    case C_LEFT:
-    case C_RIGHT:
-        player->move_input[command - C_FORWARD] = 1.0f;
+    case CS_FORWARD:
+    case CS_BACKWARD:
+    case CS_LEFT:
+    case CS_RIGHT:
+        player->move_input[(command - CS_FORWARD) / 2] = 1.0f;
+        break;
+
+    case CE_FORWARD:
+    case CE_BACKWARD:
+    case CE_LEFT:
+    case CE_RIGHT:
+        player->move_input[(command - CE_FORWARD) / 2] = 0.0f;
         break;
 
     // TODO: Player jumping needs somekind of delay for holding down the
     // button.
-    case C_JUMP:
-        player->jump = true;
+    case CS_JUMP:
+        player->jumping = true;
+        break;
+    case CE_JUMP:
+        player->jumping = false;
+        break;
+
+    case CS_PRIMARY_ATTACK:
+        player->primary_attacking = true;
+        break;
+    case CE_PRIMARY_ATTACK:
+        player->primary_attacking = false;
+        break;
+
+    case CS_SECONDARY_ATTACK:
+        player->secondary_attacking = true;
+        break;
+    case CE_SECONDARY_ATTACK:
+        player->secondary_attacking = false;
         break;
     }
 }

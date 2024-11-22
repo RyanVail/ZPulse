@@ -18,7 +18,13 @@ typedef struct p_player {
     f32 move_input[4];
 
     /* If this player is trying to jump. */
-    bool jump;
+    bool jumping;
+
+    /* If this player is trying to use their primary attack. */
+    bool primary_attacking;
+
+    /* If this player is trying to use their secondary attack. */
+    bool secondary_attacking;
 } p_player;
 
 /**

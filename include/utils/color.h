@@ -3,6 +3,7 @@
 
 #include <common.h>
 
+// TODO: This should be moved to render.
 typedef struct rgba8 {
     u8 r;
     u8 g;

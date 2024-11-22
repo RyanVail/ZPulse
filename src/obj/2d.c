@@ -5,7 +5,15 @@
  */
 r_tex o_2d_tex(const o_2d* obj)
 {
-    return o_sprite(obj->sprite)->tex;
+    return o_2d_sprite(obj)->tex;
+}
+
+/**
+ * Gets the sprite of a 2D object.
+ */
+const o_sprite_2d* o_2d_sprite(const o_2d* obj)
+{
+    return o_sprite(obj->sprite);
 }
 
 /**
@@ -13,7 +21,15 @@ r_tex o_2d_tex(const o_2d* obj)
  */
 rgba8 o_2d_color(const o_2d* obj)
 {
-    return o_sprite(obj->sprite)->color;
+    return o_2d_sprite(obj)->color;
+}
+
+/**
+ * Calculates the angle of a 2D object.
+ */
+f32 o_2d_ang(const o_2d* obj)
+{
+    return ((f32)obj->rot / 65535.0f) * (2 * (f32)M_PI);
 }
 
 /**

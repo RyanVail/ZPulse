@@ -1,0 +1,70 @@
+#ifndef GAME_RB_2D_H
+#define GAME_RB_2D_H
+
+#include <obj/rb_2d.h>
+#include <utils/vector.h>
+
+/* The global list of 2D rectangle rigid bodies. */
+extern VEC(o_rb_2d_rect) g_rb_2d_rects;
+
+/* The global list of 2D circle rigid bodies. */
+extern VEC(o_rb_2d_circle) g_rb_2d_circles;
+
+/**
+ * Adds a circle rigid body to the global 2D object list with the default
+ * circle rigid body struct and any supplied field modifications.
+ */
+#define G_ADD_RB_CIRCLE(...) \
+    g_add_rb_circle ( \
+        (const o_rb_2d_circle) { \
+            .obj = { \
+                .pos = { 0.0f, 0.0f }, \
+                .scale = { 16, 16 }, \
+                .rot = 0, \
+                .sprite = 0, \
+            }, \
+            .vel = { 0.0f, 0.0f }, \
+            .ang_vel = 0.0f, \
+            .inv_mass = 8192, \
+            .mat = 0, \
+            __VA_ARGS__ \
+        } \
+    )
+
+/**
+ * Adds a circle rigid body to the global 2D object list.
+ */
+o_rb_2d_circle* g_add_rb_circle(const o_rb_2d_circle circle);
+
+/**
+ * Adds a rectangle rigid body to the global 2D rectangle object list with the
+ * default rectangle rigid body struct and any supplied field modifications.
+ */
+#define G_ADD_RB_CIRCLE(...) \
+    g_add_rb_circle ( \
+        (const o_rb_2d_circle) { \
+            .obj = { \
+                .pos = { 0.0f, 0.0f }, \
+                .scale = { 16, 16 }, \
+                .rot = 0, \
+                .sprite = 0, \
+            }, \
+            .vel = { 0.0f, 0.0f }, \
+            .ang_vel = 0.0f, \
+            .inv_mass = 8192, \
+            .mat = 0, \
+            __VA_ARGS__ \
+        } \
+    )
+
+/**
+ * Adds a rectangle rigid body to the global 2D object list.
+ */
+o_rb_2d_rect* g_add_rb_rect(const o_rb_2d_rect rect);
+
+/**
+ * Ticks all of the 2D rigid bodies.
+ */
+void g_tick_2d_rbs();
+
+#endif
