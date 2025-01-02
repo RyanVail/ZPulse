@@ -18,6 +18,7 @@
 #include <phys/mat.h>
 #include <phys/grid.h>
 #include <render/camera.h>
+#include <math/f32.h>
 
 static r_cam cam;
 
@@ -52,7 +53,7 @@ void p_tick(p_player* player)
             obj = g_add_obj_2d(&_obj);
         } else {
             const f32 dist = f32_v2_mag(f32_v2_sub(circle_start, mouse_pos));
-            obj->scale.x = (i32)(fabsf(dist) * 711.111111f);
+            obj->scale.x = (i32)(f32_abs(dist) * 711.111111f);
         }
     } else {
         if (obj != NULL && circle_start.x != FLT_MAX) {
@@ -197,7 +198,7 @@ int main()
     const pe_mat_id player_mat_id = pe_add_mat(&player_mat);
 
     o_rb_2d_circle* player_circle = G_ADD_RB_CIRCLE (
-        .obj.pos = { -0.5f, -0.5f },
+        .obj.pos = { -0.9f, -0.5f },
         .obj.scale = { 1 << 6, 1 << 6 },
         .obj.sprite = test_sprite,
         .inv_mass = 0,

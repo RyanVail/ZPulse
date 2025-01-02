@@ -63,27 +63,12 @@ void pe_2d_init()
     VEC_INIT(pe_pairs_2d, PE_2D_PAIRS_INIT_LEN);
 }
 
+#if 0
 /**
  * Finds pairs of possible collisions between circle rigid bodies.
  */
 void pe_find_circle_circle_pairs()
 {
-#if 0
-    if (g_rb_2d_circles.len == 0)
-        return;
-
-    /* Adding the pairs to the global pair list. */
-    for (size_t i = 0; i < g_rb_2d_circles.len - 1; i++) {
-        for (size_t j = i + 1; j < g_rb_2d_circles.len; j++) {
-            pe_circle_circle_pair_2d* pair = (void*)VEC_DRY_APPEND(pe_pairs_2d);
-            pair->circle_index = i;
-            pair->other_circle_index = j;
-        }
-    }
-
-    /* Setting the index in p_pairs_2d where dual circle pairs end. */
-    pe_circle_circle_end = pe_pairs_2d.len;
-#endif
     // TODO: Is there a better way to iterate?
     for (size_t i = 0; i < ARRAY_LEN(pe_grid.divisions); i++) {
         u32 obj = pe_grid.divisions[i];
@@ -107,13 +92,51 @@ void pe_find_circle_circle_pairs()
     /* Setting the index in p_pairs_2d where dual circle pairs end. */
     pe_circle_circle_end = pe_pairs_2d.len;
 }
+#endif
+
+static void pe_find_pairs_for (
+    const pe_grid_flat_ids* ids,
+    size_t index,
+    const g_rb_2d_id finding_id )
+{
+    index += 1;
+    u32 depth = 0;
+    for (size_t i = index; i < ids->len; i++) {
+        const g_rb_2d_id id = VEC_AT(*ids, i);
+
+        if (id == PE_GRID_RB_DEPTH_DOWN) {
+            depth++;
+        } else if (id == PE_GRID_RB_DEPTH_UP) {
+            /* This body cannot collide with any more bodies. */
+            if (depth == 0)
+                return;
+
+            depth--;
+        } else {
+            pe_circle_circle_pair_2d* pair = (void*)VEC_DRY_APPEND(pe_pairs_2d);
+            pair->circle_index = finding_id & u32_mask_bits(31);
+            pair->other_circle_index = id & u32_mask_bits(31);
+        }
+    }
+}
 
 /**
  * Finds all of the 2D rigid body pairs of possible collisions.
  */
 void pe_find_pairs()
 {
-    pe_find_circle_circle_pairs();
+    const pe_grid_flat_ids* ids = pe_grid_flatten();
+    for (size_t i = 0; i < ids->len; i++) {
+        const g_rb_2d_id id = VEC_AT(*ids, i);
+        if (id == PE_GRID_RB_DEPTH_DOWN || id == PE_GRID_RB_DEPTH_UP)
+            continue;
+
+        pe_find_pairs_for(ids, i, id);
+    }
+
+    // TODO: This has to be changed.
+    /* Setting the index in p_pairs_2d where dual circle pairs end. */
+    pe_circle_circle_end = pe_pairs_2d.len;
 }
 
 /**

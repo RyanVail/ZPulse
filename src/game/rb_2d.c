@@ -32,7 +32,7 @@ o_rb_2d_type g_rb_2d_get_type(const o_rb_2d* rb)
 g_rb_2d_id g_rb_2d_get_id(const o_rb_2d* rb)
 {
     return (g_rb_2d_get_type(rb) == O_RB_2D_CIRCLE)
-        ? (g_rb_2d_id)((1u << 31) | VEC_PTR_INDEX(g_rb_2d_circles, rb))
+        ? (g_rb_2d_id)(((u32)1 << 31) | VEC_PTR_INDEX(g_rb_2d_circles, rb))
         : (g_rb_2d_id)(VEC_PTR_INDEX(g_rb_2d_rects, rb));
 }
 
@@ -45,8 +45,9 @@ o_rb_2d_circle* g_add_rb_circle(const o_rb_2d_circle circle)
     // rigid bodies are moved like what's done in the ticking function and
     // there should be warning in the rigid body struct.
     pe_grid_rb_2d_add (
-        (1u << 31) | g_rb_2d_circles.len,
-        pe_grid_division(circle.obj.pos)
+        ((u32)1 << 31) | g_rb_2d_circles.len,
+        circle.obj.pos,
+        o_rb_2d_circle_radius(&circle)
     );
 
     o_rb_2d_circle* ptr = VEC_DRY_APPEND(g_rb_2d_circles);
@@ -59,7 +60,12 @@ o_rb_2d_circle* g_add_rb_circle(const o_rb_2d_circle circle)
  */
 o_rb_2d_rect* g_add_rb_rect(const o_rb_2d_rect rect)
 {
-    pe_grid_rb_2d_add(g_rb_2d_rects.len, pe_grid_division(rect.obj.pos));
+    pe_grid_rb_2d_add (
+        g_rb_2d_rects.len,
+        rect.obj.pos,
+        1.0f // TODO: This.
+    );
+
     o_rb_2d_rect* ptr = VEC_DRY_APPEND(g_rb_2d_rects);
     memcpy(ptr, &rect, sizeof(rect));
     return ptr;
@@ -72,6 +78,7 @@ void g_tick_2d_rbs()
 {
     for VEC_ITER(g_rb_2d_rects, rect)
         o_rb_2d_rect_tick(rect);
+
     for VEC_ITER(g_rb_2d_circles, circle)
         o_rb_2d_circle_tick(circle);
 }

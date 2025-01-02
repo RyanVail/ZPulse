@@ -32,15 +32,9 @@
 #define PE_DEFAULT_ROT 0
 #define PE_DEFAULT_VEL { 0.0f, 0.0f }
 #define PE_DEFAULT_ANG_VEL 0.0f
-
-/* The size of the physics grid. */
+#define PE_GRID_GROUP_MAX_DEPTH 64
+#define PE_GRID_GROUP_RB_LEN 64
 #define PE_GRID_SIZE 256
-
-/*
- * The number of divisions the grid is split into for collision detection in
- * powers of two.
- */
-#define PE_GRID_DIVISIONS 10
 
 /* Rendering settings. */
 #define R_SPRITE_DEFAULT_SHAPE R_SHAPE_CIRCLE

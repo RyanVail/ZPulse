@@ -22,6 +22,7 @@ typedef struct o_rb_2d {
     /* The velocity of this rigid body. */
     f32_v2 vel;
 
+    // TODO: This should be an fu32.
     /* The angular velocity of this rigid body. */
     f32 ang_vel;
 

@@ -32,14 +32,19 @@ void o_rb_2d_tick(o_rb_2d* rb)
 
     /* Ticking the vel of this rigid body. */
     if (!f32_v2_is_zero(rb->vel)) {
-        const u32 old_grid_divison = pe_grid_division(rb->obj.pos);
+        const f32_v2 old_pos = rb->obj.pos;
+        const f32 size = o_rb_2d_circle_radius(rb); // TODO: Should be generic.
+
         rb->obj.pos = f32_v2_add(rb->obj.pos, rb->vel);
         rb->vel = f32_v2_mul(rb->vel, f32_v2_splat(1.0f - mat->air_res));
 
-        /* Readding this object to the grid if it moved grid divisions. */
-        const u32 new_grid_divison = pe_grid_division(rb->obj.pos);
-        if (new_grid_divison != old_grid_divison)
-            pe_grid_rb_2d_move(rb, old_grid_divison, new_grid_divison);
+        pe_grid_rb_2d_move (
+            g_rb_2d_get_id(rb),
+            old_pos,
+            size,
+            rb->obj.pos,
+            size
+        );
     }
 }
 

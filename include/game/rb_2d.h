@@ -52,6 +52,9 @@
  */
 typedef u32 g_rb_2d_id;
 
+/* A null *g_rb_2d_id* value. */
+#define G_RB_2D_ID_NULL UINT32_MAX
+
 /* The global list of 2D rectangle rigid bodies. */
 extern VEC(o_rb_2d_rect) g_rb_2d_rects;
 
@@ -81,7 +84,6 @@ o_rb_2d_type g_rb_2d_get_type(const o_rb_2d* rb);
  * @warning The id of global objects can change when null objects are cleaned.
  */
 g_rb_2d_id g_rb_2d_get_id(const o_rb_2d* rb);
-
 
 /**
  * Ticks all of the 2D rigid bodies.

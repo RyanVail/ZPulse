@@ -37,14 +37,17 @@ args = [
   '-Wextra',
   '-Wall',
   '-Wno-override-init',
-  '-g',
-  '-Og',
+  '-Ofast',
+  '-mtune=rocketlake',
+  '-march=rocketlake',
+  '-ftree-vectorize',
+  '--fast-math',
 ]
 
 largs = [
   '-lGL',
   '-lGLU',
-  '-lglfw3',
+  '-lglfw',
   '-lX11',
   '-lXxf86vm',
   '-lXrandr',

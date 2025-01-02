@@ -288,11 +288,8 @@ size_t vector_ptr_index(vector* vec, const void* ptr, size_t type_size)
         "Tried to get the data index of a pointer within a vector that "
         "doesn't point to data within the vector."
     );
-    
-    DEBUG_ASSERT (((uintptr_t)ptr & u32_mask_bits((u32)type_size)) == 0,
-        "Tried to get the data index of a pointer within a vector that isn't "
-        "aligned to the type size of the data within the vector."
-    );
+
+    // TODO: Add back this warning but correctly this time.
 
     return ((uintptr_t)ptr - (uintptr_t)vec->data) / type_size;
 }

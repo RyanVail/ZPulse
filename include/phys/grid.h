@@ -7,32 +7,53 @@
 #include <game/rb_2d.h>
 #include <assert.h>
 
-/* Ensuring the grid divisions is valid. */
-static_assert(PE_GRID_DIVISIONS >= 1, "PE_GRID_DIVISIONS less than one.");
+#define PE_GRID_RB_DEPTH_UP G_RB_2D_ID_NULL
+#define PE_GRID_RB_DEPTH_DOWN (G_RB_2D_ID_NULL - 1)
 
-typedef struct pe_grid_obj {
-    // TODO: This should be renamed id.
-    /* The id of the rb. */
-    u32 rb;
+static_assert (G_RB_2D_ID_NULL == UINT32_MAX,
+    "Physics grid needs G_RB_2D_ID_NULL to be null"
+);
+
+typedef struct pe_grid_bodies {
+    /*
+     * The ids of the rigid bodies within this group. May contain nulls for rb
+     * ids that don't contain rbs.
+     */
+    g_rb_2d_id rbs[PE_GRID_GROUP_RB_LEN];
 
     /*
-     * The index of the next obj in this division or UINT32_MAX if there's no
-     * more in this division.
+     * The next group of bodies in this group or *UINT32_MAX* if there aren't
+     * any more bodies.
      */
-    u32 next;
-} pe_grid_obj;
+    u32 next_group;
+} pe_grid_bodies;
+
+typedef struct pe_grid_group {
+    /*
+     * The indicies of the groups within this group. If this group reached the
+     * maximum group depth these will be sub groups, otherwise these are other
+     * groups. May contain *UINT32_MAX* values meaning the group in that quad
+     * doesn't contain any bodies.
+     */
+    u32 groups[4];
+
+    /* The rigid bodies within this group. */
+    pe_grid_bodies bodies;
+} pe_grid_group;
 
 extern struct {
-    VEC(pe_grid_obj) objs;
+    VEC(pe_grid_group) groups;
+    VEC(pe_grid_bodies) bodies;
 
-    /*
-     * The start of the null obj linked list in objs or UINT32_MAX if there's
-     * no null objects.
-     */
-    u32 first_empty;
-
-    u32 divisions[1 << (PE_GRID_DIVISIONS * 2)];
+    u32 first_empty_group;
+    u32 first_empty_bodies;
 } pe_grid;
+
+/*
+ * A flat version of the physics grid quad tree. *PE_GRID_RB_DEPTH_UP* and
+ * *PE_GRID_RB_DEPTH_DOWN* denote changes in depth.
+ */
+typedef VEC(g_rb_2d_id) pe_grid_flat_ids;
 
 // TODO: There should be another file in the headers called debug.h for debug
 // things because this is just bad.
@@ -45,32 +66,35 @@ void pe_debug_draw_grid(const r_cam* cam);
 #endif
 
 /**
- * Gets the grid division of a position.
+ * Gets the grid bodies group for a position and size.
+ *
+ * @warning All pointers to bodies within the physics grid become invalid after
+ * calling this function.
  */
-u32 pe_grid_division(const f32_v2 pos);
+pe_grid_bodies* pe_grid_get_bodies(const f32_v2 pos, f32 size);
 
 /**
  * Adds a 2D rigid body to the physics grid.
  */
-void pe_grid_rb_2d_add(g_rb_2d_id id, u32 division);
+void pe_grid_rb_2d_add(g_rb_2d_id id, const f32_v2 pos, f32 size);
 
 /**
- * Removes a 2D rigid body from the physics grid and returns the index of the
- * grid object it use to occupy. The returned index of the grid object must
- * either be added to the null list within the physics grid with
- * pe_grid_rb_2d_null or readded to the physics grid through pe_grid_obj_add.
+ * If required, moves a 2D rigid body in the physics grid after a size and or a
+ * position change.
  */
-u32 pe_grid_rb_2d_remove(g_rb_2d_id id, u32 division);
+void pe_grid_rb_2d_move (
+    g_rb_2d_id id,
+    const f32_v2 old_pos,
+    f32 old_size,
+    const f32_v2 new_pos,
+    f32 new_size );
 
 /**
- * Moves a 2D rigid body in the physics grid.
+ * Flattens the physics quad tree into a single vector.
+ *
+ * @warning The vector returned by this function is valid up until this
+ * function is called again.
  */
-void pe_grid_rb_2d_move(o_rb_2d* rb, u32 old_division, u32 new_division);
-
-/**
- * Adds a rigid body's grid object to the physics grid in the specified
- * division.
- */
-void pe_grid_obj_add(u32 grid_obj_index, u32 division);
+const pe_grid_flat_ids* pe_grid_flatten();
 
 #endif

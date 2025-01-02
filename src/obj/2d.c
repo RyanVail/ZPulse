@@ -71,7 +71,6 @@ f32 o_2d_size_y(const o_2d* obj)
  */
 f32_v2 o_2d_size_f32_v2(const o_2d* obj)
 {
-    // TODO: Find the best solution for this.
     return (f32_v2) {
         .x = o_2d_size_x(obj),
         .y = o_2d_size_y(obj),
