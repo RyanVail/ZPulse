@@ -48,8 +48,7 @@
     )
 
 /*
- * The id attached to a 2D rigid body in the global 2D object list. This id may
- * change when null objects are cleaned.
+ * The id attached to a 2D rigid body in the global 2D object list.
  */
 typedef u32 g_rb_2d_id;
 
