@@ -19,3 +19,19 @@ f32 f32_abs(f32 a)
 {
     return fabsf(a);
 }
+
+/**
+ * Squares an f32 values.
+ */
+f32 f32_sqr(f32 a)
+{
+    return a * a;
+}
+
+/**
+ * Square roots an f32 value.
+ */
+f32 f32_sqrt(f32 a)
+{
+    return sqrtf(a);
+}

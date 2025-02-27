@@ -64,16 +64,29 @@ void o_rb_2d_circle_tick(o_rb_2d_circle* circle)
     o_rb_2d_tick((o_rb_2d*)circle);
 }
 
-// TODO: Rename the inputs of this function to make more sense and document it
-// more.
 /**
- * Applies a force to a 2D rigid body.
+ * Applies an impact force to a 2D rigid body.
  */
-void o_rb_2d_apply_force (
+void o_rb_2d_apply_impact (
     o_rb_2d* rb,
     f32 inv_inertia,
     f32_v2 force_vec,
     f32_v2 contact_vec )
+{
+    if (rb->inv_mass == 0)
+        return;
+
+    o_rb_2d_apply_force(rb, inv_inertia, force_vec);
+
+    rb->ang_vel += inv_inertia * (
+        (contact_vec.x * force_vec.y) + (contact_vec.y * force_vec.x)
+    );
+}
+
+/**
+ * Applies a force to a 2D rigid body.
+ */
+void o_rb_2d_apply_force(o_rb_2d* rb, f32 inv_inertia, f32_v2 force_vec)
 {
     if (rb->inv_mass == 0)
         return;
@@ -84,10 +97,6 @@ void o_rb_2d_apply_force (
             force_vec,
             f32_v2_splat(o_rb_2d_inv_mass(rb))
         )
-    );
-
-    rb->ang_vel += inv_inertia * (
-        (contact_vec.x * force_vec.y) + (contact_vec.y * force_vec.x)
     );
 }
 

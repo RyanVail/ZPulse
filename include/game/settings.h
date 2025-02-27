@@ -1,0 +1,8 @@
+#ifndef GAME_SETTINGS_H
+#define GAME_SETTINGS_H
+
+#define G_OBJ_2D_INIT_LEN 512
+#define G_RB_2D_INIT_LEN 128
+#define G_LOCAL_PLAYERS_INIT_LEN 8
+
+#endif

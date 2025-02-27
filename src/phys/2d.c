@@ -2,6 +2,7 @@
 #include <phys/2d.h>
 #include <phys/grid.h>
 #include <math/u32.h>
+#include <math/f32.h>
 
 // TODO: All this has to do to check if a pair was already check is to just
 // check if the found index of the same type of rb is lower than the current
@@ -139,6 +140,56 @@ void pe_find_pairs()
     pe_circle_circle_end = pe_pairs_2d.len;
 }
 
+static void pe_solve_intersection (
+    o_rb_2d* r0,
+    o_rb_2d* r1,
+    f32 combined_inv_mass,
+    f32_v2 normal,
+    f32 overlap )
+{
+    // TODO: This calculation could be done before calling this function for
+    // perf.
+    /* If these bodies aren't intersecting. */
+    if (overlap < PE_INTERSECTION_MIN_OVERLAY)
+        return;
+
+    const f32 force = overlap * PE_INTERSECTION_FIX_RATIO / combined_inv_mass;
+
+    const f32_v2 force_vec = f32_v2_mul(normal, f32_v2_splat(force));
+
+    const f32_v2 r0_old_pos = r0->obj.pos;
+    const f32_v2 r1_old_pos = r1->obj.pos;
+
+    const f32 r0_size = o_rb_2d_circle_radius(r0);
+    const f32 r1_size = o_rb_2d_circle_radius(r1);
+
+    r0->obj.pos = f32_v2_sub (
+        r0->obj.pos,
+        f32_v2_mul(force_vec, f32_v2_splat(o_rb_2d_inv_mass(r0)))
+    );
+
+    r1->obj.pos = f32_v2_add (
+        r1->obj.pos,
+        f32_v2_mul(force_vec, f32_v2_splat(o_rb_2d_inv_mass(r1)))
+    );
+
+    pe_grid_rb_2d_move (
+        g_rb_2d_get_id(r0),
+        r0_old_pos,
+        r0_size,
+        r0->obj.pos,
+        r0_size
+    );
+
+    pe_grid_rb_2d_move (
+        g_rb_2d_get_id(r1),
+        r1_old_pos,
+        r1_size,
+        r1->obj.pos,
+        r1_size
+    );
+}
+
 /**
  * Solves the possible collision of two 2D circle rigid bodies.
  */
@@ -148,9 +199,8 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
     o_rb_2d_circle* c1 = &VEC_AT(g_rb_2d_circles, pair->other_circle_index);
 
     /* The combined squared radi of the circles. */
-    const f32 radius_sqrd = powf (
-        o_rb_2d_circle_radius(c0) + o_rb_2d_circle_radius(c1),
-        2
+    const f32 radius_sqrd = f32_sqr (
+        o_rb_2d_circle_radius(c0) + o_rb_2d_circle_radius(c1)
     );
 
     // TODO: This doesn't account for what if the object's are in the same
@@ -161,15 +211,9 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
     /* The squared distance between the circles. */
     const f32 dist_sqrd = f32_v2_mag_sqrd(normal);
 
-    /* If the circles are already colliding without scaling. */
-    if (radius_sqrd > dist_sqrd)
-        goto solve;
-
     /* If there was no collision. */
-    return;
-
-    /* Solves the collision. */
-    solve:
+    if (radius_sqrd <= dist_sqrd)
+        return;
 
     // TODO: Make sure this becomes a inv sqrt.
     normal = f32_v2_mul(normal, f32_v2_splat(1.0f / sqrtf(dist_sqrd)));
@@ -201,7 +245,19 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
 
     const f32 vel_along_norm = (vel.x * normal.x) + (vel.y * normal.y);
 
-    /* Don't do anything if the objects are seperating. */
+    const f32 inv_mass = (f32) (
+        (u32)c0->inv_mass + (u32)c1->inv_mass
+    ) / (1 << 11);
+
+    pe_solve_intersection (
+        c0,
+        c1,
+        inv_mass,
+        normal,
+        1.0f - (f32_sqrt(dist_sqrd / radius_sqrd))
+    );
+
+    /* Don't do anything impact processing if the objects are seperating. */
     if (vel_along_norm > 0)
         return;
 
@@ -213,18 +269,14 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
     const f32 p0_cross = (p0.x * normal.y) - (p0.y * normal.x);
     const f32 p1_cross = (p1.x * normal.y) - (p1.y * normal.x);
 
-    const f32 inv_mass = (f32) (
-        (u32)c0->inv_mass + (u32)c1->inv_mass
-    ) / (1 << 11);
-    
     f32 force = -(1 + restitution) * vel_along_norm;
     force /= inv_mass + (p0_cross * p0_cross) * mat0->inv_inertia
         + (p1_cross * p1_cross) * mat1->inv_inertia;
 
     const f32_v2 force_vec = f32_v2_mul(normal, f32_v2_splat(force));
 
-    o_rb_2d_apply_force(c0, mat0->inv_inertia, f32_v2_neg(force_vec), p0);
-    o_rb_2d_apply_force(c1, mat1->inv_inertia, force_vec, p1);
+    o_rb_2d_apply_impact(c0, mat0->inv_inertia, f32_v2_neg(force_vec), p0);
+    o_rb_2d_apply_impact(c1, mat1->inv_inertia, force_vec, p1);
 }
 
 /**

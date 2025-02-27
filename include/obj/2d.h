@@ -17,8 +17,8 @@ typedef struct o_2d {
     /* The rotation of this object. */
     fu16 rot;
 
-    // TODO: Try to move this out of the memory of the object to see if that
-    // makes this faster.
+    // TODO: This should be moved out of the object definition so the objects
+    // can hold their location in the physics grid.
     /* The id of the sprite of this object. */
     o_sprite_id_2d sprite;
 } o_2d;

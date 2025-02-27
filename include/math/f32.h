@@ -13,4 +13,14 @@ f32 f32_clamp(f32 a, f32 min, f32 max);
  */
 f32 f32_abs(f32 a);
 
+/**
+ * Squares an f32 value.
+ */
+f32 f32_sqr(f32 a);
+
+/**
+ * Square roots an f32 value.
+ */
+f32 f32_sqrt(f32 a);
+
 #endif

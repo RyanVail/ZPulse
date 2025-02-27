@@ -3,6 +3,7 @@
 #ifndef OBJ_SPRITE_2D_H
 #define OBJ_SPRITE_2D_H
 
+#include <render/settings.h>
 #include <render/texture.h>
 #include <render/filter.h>
 #include <render/shape.h>

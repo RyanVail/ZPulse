@@ -3,6 +3,7 @@
 
 #include <obj/rb_2d.h>
 #include <utils/vector.h>
+#include <phys/settings.h>
 
 /**
  * Adds a rectangle rigid body to the global rectangle list with the default

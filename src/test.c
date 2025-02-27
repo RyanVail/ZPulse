@@ -19,6 +19,7 @@
 #include <phys/grid.h>
 #include <render/camera.h>
 #include <math/f32.h>
+#include <window/settings.h>
 
 static r_cam cam;
 
@@ -61,6 +62,7 @@ void p_tick(p_player* player)
                 .obj.pos = obj->pos,
                 .obj.scale = obj->scale,
                 .obj.sprite = mouse_circle_id,
+                .inv_mass = 2048,
             );
 
             g_remove_obj_2d(obj);

@@ -6,7 +6,7 @@
 /* The global grid. */
 typeof(pe_grid) pe_grid;
 
-static pe_grid_flat_ids flat_ids_vec;;
+static pe_grid_flat_ids flat_ids_vec;
 
 #if DEBUG
 #include <render/render.h>

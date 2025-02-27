@@ -4,6 +4,7 @@
 #include <math/f32_v2.h>
 #include <command/command.h>
 #include <assert.h>
+#include <input/settings.h>
 
 typedef enum i_mouse_button {
     I_MOUSE_BUTTON_LEFT_CLICK,

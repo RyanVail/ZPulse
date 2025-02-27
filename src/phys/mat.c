@@ -1,5 +1,6 @@
 #include <phys/mat.h>
 #include <utils/vector.h>
+#include <phys/settings.h>
 
 /* The global physics material list. */
 VEC(pe_mat) pe_mats;

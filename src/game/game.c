@@ -3,6 +3,7 @@
 #include <game/rb_2d.h>
 #include <utils/vector.h>
 #include <player/player.h>
+#include <game/settings.h>
 
 // TODO: It may make more sense if this was moved into game/player.c
 /* The global local player list. */

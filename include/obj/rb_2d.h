@@ -68,13 +68,18 @@ void o_rb_2d_rect_tick(o_rb_2d_rect* rect);
 void o_rb_2d_circle_tick(o_rb_2d_circle* circle);
 
 /**
- * Applies a force to a 2D rigid body.
+ * Applies an impact force to a 2D rigid body.
  */
-void o_rb_2d_apply_force (
+void o_rb_2d_apply_impact (
     o_rb_2d* rb,
     f32 inv_inertia,
     f32_v2 force_vec,
     f32_v2 contact_vec );
+
+/**
+ * Applies a force to a 2D rigid body.
+ */
+void o_rb_2d_apply_force(o_rb_2d* rb, f32 inv_inertia, f32_v2 force_vec);
 
 /**
  * Gets the inverse mass of a 2D rigid body.

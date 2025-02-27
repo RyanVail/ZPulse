@@ -1,6 +1,7 @@
 #include <libs/glfw.h>
 #include <window/glfw.h>
 #include <render/init.h>
+#include <window/settings.h>
 
 /**
  * Resizes the OpenGL viewport when the window size changes.

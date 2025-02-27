@@ -34,17 +34,14 @@ void r_circle(const r_cam* cam, const o_2d* obj)
     glBindTexture(GL_TEXTURE_2D, o_2d_tex(obj));
     glBegin(GL_POLYGON);
 
-    const f32_v2 size = f32_v2_mul (
-        f32_v2_splat(0.72f),
-        o_2d_size_f32_v2(obj)
-    );
+    const f32_v2 size = o_2d_size_f32_v2(obj);
 
     // TODO: This should just calculate them twice in the render loop.
     /* Half of the points surrounding the circle. */
     static f32_v2 points[R_CIRCLE_POINTS / 2];
 
     /* Incraments to increase the angle of points by. */
-    const f32 inc = (f32)M_PI / (R_CIRCLE_POINTS / 2);
+    const f32 inc = (f32)(M_PI / (f64)(R_CIRCLE_POINTS / 2));
 
     /*
      * Rotating the points of the circle based on the rotation of the object.
