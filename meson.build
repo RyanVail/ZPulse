@@ -23,6 +23,7 @@ src = [
   'src/game/rb_2d.c',
   'src/game/obj_2d.c',
   'src/game/grid.c',
+  'src/game/pe_rope.c',
   'src/obj/2d.c',
   'src/math/f32_v2.c',
   'src/math/f32.c',
@@ -30,6 +31,7 @@ src = [
   'src/utils/color.c',
   'src/math/fu16_v2.c',
   'src/phys/grid.c',
+  'src/phys/rope.c',
   'src/math/u32.c'
 ]
 
@@ -37,11 +39,7 @@ args = [
   '-Wextra',
   '-Wall',
   '-Wno-override-init',
-  '-Ofast',
-  '-mtune=rocketlake',
-  '-march=rocketlake',
-  '-ftree-vectorize',
-  '--fast-math',
+  '-Og',
 ]
 
 largs = [

@@ -17,8 +17,9 @@ o_rb_2d_type g_rb_2d_get_type(const o_rb_2d* rb)
         return O_RB_2D_RECT;
 
     DEBUG_ASSERT (VEC_IS_PTR_WITHIN(g_rb_2d_circles, rb),
-        "Tried to get the type of a rigid body that isn't in the global 2D "
-        "object list."
+        "Tried to get the type of a rigid body (%p) that isn't in the global "
+        "2D object list.",
+        rb
     );
 
     return O_RB_2D_CIRCLE;
@@ -69,6 +70,19 @@ o_rb_2d_rect* g_add_rb_rect(const o_rb_2d_rect rect)
     o_rb_2d_rect* ptr = VEC_DRY_APPEND(g_rb_2d_rects);
     memcpy(ptr, &rect, sizeof(rect));
     return ptr;
+}
+
+o_rb_2d* g_rb_2d_get(g_rb_2d_id id)
+{
+    // TODO: There should be a better way to do this.
+    return ((id & (u32)1 << 31) != 0)
+        ? &VEC_AT(g_rb_2d_circles, id & u32_mask_bits(31))
+        : &VEC_AT(g_rb_2d_rects, id);
+}
+
+const o_rb_2d* g_rb_2d_get_const(g_rb_2d_id id)
+{
+    return (const o_rb_2d*)g_rb_2d_get(id);
 }
 
 /**

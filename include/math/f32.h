@@ -4,6 +4,11 @@
 #include <common.h>
 
 /**
+ * Checks if an f32 value is nan.
+ */
+bool f32_is_nan(f32 a);
+
+/**
  * Clamps an f32 between a minimum and maximum.
  */
 f32 f32_clamp(f32 a, f32 min, f32 max);

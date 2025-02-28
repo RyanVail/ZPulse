@@ -1,5 +1,10 @@
 #include <math/f32.h>
 
+bool f32_is_nan(f32 a)
+{
+    return isnan(a) != 0;
+}
+
 /**
  * Clamps an f32 between a minimum and maximum.
  */

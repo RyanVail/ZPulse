@@ -20,6 +20,7 @@
 #include <render/camera.h>
 #include <math/f32.h>
 #include <window/settings.h>
+#include <game/pe_rope.h>
 
 static r_cam cam;
 
@@ -117,13 +118,15 @@ void test_repel (
     }
 }
 
-void test_player_line(const o_rb_2d_circle* player_circle)
+void test_player_line (
+    const o_rb_2d_circle* player_circle,
+    const o_rb_2d_circle* repel_circle )
 {
 #if DEBUG
     r_line (
         &cam,
         player_circle->obj.pos,
-        (const f32_v2) { 0.0f, 0.0f },
+        repel_circle->obj.pos,
         (const rgba8) { 0, 0, 0, 0 }
     );
 #endif
@@ -158,7 +161,7 @@ int main()
 
     cam = (r_cam) {
         .pos = { 0.0f, 0.0f },
-        .zoom = { 1.0f * W_RATIO, 1.0f },
+        .zoom = { 0.5f * W_RATIO, 0.5f },
     };
 
     r_tex test_tex = r_tex_from_image(raw, width, height);
@@ -172,23 +175,61 @@ int main()
         .color = (const rgba8) { 255, 128, 128, 0 },
     );
 
+    o_sprite_id_2d test_circle_sprite_id = O_ADD_SPRITE (
+        .color = (const rgba8) { 158, 32, 100, 0 },
+    );
+
     /* Creating a bunch of tiny test circles. */
-    for (u32 i = 0; i < 256; i++) {
-        UNUSED o_rb_2d_circle* circle = G_ADD_RB_CIRCLE (
+    g_rb_2d_id small_circle_ids[256];
+    for (u32 i = 0; i < ARRAY_LEN(small_circle_ids); i++) {
+        o_rb_2d_circle* circle = G_ADD_RB_CIRCLE (
             .obj.pos = (f32_v2) {
                 (i & 31) * 0.0425f - 0.7f,
                 (i >> 5) * 0.0425f - 0.7f
             },
             .obj.scale = (fu16_v2) { 1 << 3, 1 << 3 },
-            .inv_mass = 65535,
+            .obj.sprite = test_circle_sprite_id,
+            //.inv_mass = 65535,
+            .inv_mass = 8,
         );
+
+        small_circle_ids[i] = g_rb_2d_get_id(circle);
+    }
+
+    /* Connection the circles in a fabric pattern. */
+    const f32 fabric_length = 0.225f;
+    const f32 fabric_restitution = 0.5f;
+    for (u32 i = 0; i < ARRAY_LEN(small_circle_ids); i++) {
+        if ((i & 31) != 0) {
+            G_ADD_PE_ROPE (
+                .bodies = {
+                    small_circle_ids[i - 1],
+                    small_circle_ids[i],
+                },
+                .length = fabric_length,
+                .restitution = fabric_restitution,
+                .break_force = 4.0,
+            );
+        }
+
+        if (i >= 32) {
+            G_ADD_PE_ROPE (
+                .bodies = {
+                    small_circle_ids[i],
+                    small_circle_ids[i - 32],
+                },
+                .length = fabric_length,
+                .restitution = fabric_restitution,
+                .break_force = 4.0,
+            );
+        }
     }
 
     /* Making a larger circle that repels other circles. */
     o_rb_2d_circle* repel_circle = G_ADD_RB_CIRCLE (
         .obj.pos = (f32_v2) { 0.7f, 0.7f },
         .obj.scale = (fu16_v2) { 1 << 5, 1 << 5 },
-        .inv_mass = 8,
+        .inv_mass = 8192,
     );
 
     const pe_mat player_mat = {
@@ -213,6 +254,27 @@ int main()
         .type = I_KEYBOARD_AND_MOUSE,
     };
 
+    /* Adding a test rope constraint. */
+    G_ADD_PE_ROPE (
+        .bodies = {
+            g_rb_2d_get_id(repel_circle),
+            g_rb_2d_get_id(player_circle),
+        },
+        .length = 0.25f,
+        .restitution = 0.002f,
+    );
+
+    for (u32 i = 0; i < 8; i++) {
+        G_ADD_PE_ROPE (
+            .bodies = {
+                small_circle_ids[i * 32],
+                g_rb_2d_get_id(player_circle),
+            },
+            .length = 0.25f,
+            .restitution = 2.0f,
+        );
+    }
+
     i_keyboard_load_default(p_keyboard(player));
     i_mouse_load_default(p_mouse(player));
 
@@ -226,7 +288,7 @@ int main()
         g_tick_2d_rbs();
         g_tick_players();
         cam.pos = player_circle->obj.pos;
-        test_player_line(player_circle);
+        test_player_line(player_circle, repel_circle);
         r_objs_2d(&cam);
         r_flush();
     }

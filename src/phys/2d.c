@@ -3,6 +3,7 @@
 #include <phys/grid.h>
 #include <math/u32.h>
 #include <math/f32.h>
+#include <phys/rope.h>
 
 // TODO: All this has to do to check if a pair was already check is to just
 // check if the found index of the same type of rb is lower than the current
@@ -308,4 +309,5 @@ void pe_2d_tick()
 {
     pe_find_pairs();
     pe_solve();
+    pe_rope_tick();
 }

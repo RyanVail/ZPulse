@@ -4,6 +4,7 @@
 #include <obj/rb_2d.h>
 #include <utils/vector.h>
 #include <phys/settings.h>
+#include <math/u32.h>
 
 /**
  * Adds a rectangle rigid body to the global rectangle list with the default
@@ -47,9 +48,7 @@
         } \
     )
 
-/*
- * The id attached to a 2D rigid body in the global 2D object list.
- */
+/* An id attached to a 2D rigid body in the global 2D object list. */
 typedef u32 g_rb_2d_id;
 
 /* A null *g_rb_2d_id* value. */
@@ -80,10 +79,18 @@ o_rb_2d_type g_rb_2d_get_type(const o_rb_2d* rb);
 // type so just a lsr can be used to get rid of it.
 /**
  * Gets the id of a 2D rigid body that is inside the global 2D object list.
- *
- * @warning The id of global objects can change when null objects are cleaned.
  */
 g_rb_2d_id g_rb_2d_get_id(const o_rb_2d* rb);
+
+/**
+ * Gets a pointer to the 2D rigid body pointed to by a 2D rigid body id.
+ */
+o_rb_2d* g_rb_2d_get(g_rb_2d_id id);
+
+/**
+ * Gets a const pointer to the 2D rigid body pointed to by a 2D rigid body id.
+ */
+const o_rb_2d* g_rb_2d_get_const(g_rb_2d_id id);
 
 /**
  * Ticks all of the 2D rigid bodies.

@@ -9,6 +9,7 @@
 #include <render/shape.h>
 #include <utils/color.h>
 
+// TODO: This should probably be within a game file.
 /**
  * Adds a sprite to the global sprite list with the default sprite struct and
  * any supplied field modifications. Returns the id the sprite is represented

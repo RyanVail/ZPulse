@@ -79,7 +79,7 @@ void o_rb_2d_apply_impact (
 /**
  * Applies a force to a 2D rigid body.
  */
-void o_rb_2d_apply_force(o_rb_2d* rb, f32 inv_inertia, f32_v2 force_vec);
+void o_rb_2d_apply_force(o_rb_2d* rb, f32_v2 force_vec);
 
 /**
  * Gets the inverse mass of a 2D rigid body.

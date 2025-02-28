@@ -76,7 +76,7 @@ void o_rb_2d_apply_impact (
     if (rb->inv_mass == 0)
         return;
 
-    o_rb_2d_apply_force(rb, inv_inertia, force_vec);
+    o_rb_2d_apply_force(rb, force_vec);
 
     rb->ang_vel += inv_inertia * (
         (contact_vec.x * force_vec.y) + (contact_vec.y * force_vec.x)
@@ -86,7 +86,7 @@ void o_rb_2d_apply_impact (
 /**
  * Applies a force to a 2D rigid body.
  */
-void o_rb_2d_apply_force(o_rb_2d* rb, f32 inv_inertia, f32_v2 force_vec)
+void o_rb_2d_apply_force(o_rb_2d* rb, f32_v2 force_vec)
 {
     if (rb->inv_mass == 0)
         return;

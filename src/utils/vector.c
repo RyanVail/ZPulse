@@ -269,7 +269,7 @@ void vector_init(vector* vec, size_t len, size_t type_size)
 bool vector_is_ptr_within(vector* vec, const void* ptr, size_t type_size)
 {
     return ((uintptr_t)ptr >= (uintptr_t)vec->data) 
-        && (uintptr_t)ptr < (uintptr_t)(vec->data + (vec->len * type_size));
+        && (uintptr_t)ptr < (uintptr_t)vec->data + (vec->len * type_size);
 }
 
 /**
