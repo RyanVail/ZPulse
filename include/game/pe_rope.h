@@ -16,7 +16,7 @@
     g_add_pe_rope ( \
         (const pe_rope) { \
             .length = PE_ROPE_DEFAULT_LENGTH, \
-            .restitution = PE_ROPE_DEFAULT_RESTITUTION, \
+            .strength = PE_ROPE_DEFAULT_STRENGTH, \
             .break_force = PE_ROPE_DEFAULT_BREAK_FORCE, \
             __VA_ARGS__ \
         } \

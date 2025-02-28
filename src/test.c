@@ -75,7 +75,7 @@ void p_tick(p_player* player)
     #define ACCEL_SPEED 0.0225f
     #define MAX_SPEED 0.038f
     const f32_v2 move = p_normalize_move_input(player);
-    rb->vel = f32_v2_add(rb->vel, f32_v2_mul(move, f32_v2_splat(ACCEL_SPEED)));
+    rb->vel = f32_v2_add(rb->vel, f32_v2_scale(move, ACCEL_SPEED));
     rb->vel = f32_v2_clamp (
         rb->vel,
         f32_v2_splat(-MAX_SPEED),
@@ -94,9 +94,9 @@ void test_repel (
 
         c->vel = f32_v2_add (
             c->vel, 
-            f32_v2_mul (
-                f32_v2_splat(0.0025f),
+            f32_v2_scale (
                 f32_v2_normalize(f32_v2_sub(mouse_pos, c->obj.pos))
+                0.0025f,
             )
         );
 #endif
@@ -109,10 +109,7 @@ void test_repel (
         if (player->primary_attacking) {
             c->vel = f32_v2_sub (
                 c->vel, 
-                f32_v2_mul (
-                    f32_v2_splat(0.00285f),
-                    f32_v2_normalize(dif)
-                )
+                f32_v2_scale(f32_v2_normalize(dif), 0.00285f)
             );
         }
     }
@@ -198,7 +195,7 @@ int main()
 
     /* Connection the circles in a fabric pattern. */
     const f32 fabric_length = 0.225f;
-    const f32 fabric_restitution = 0.5f;
+    const f32 fabric_strength = 0.5f;
     for (u32 i = 0; i < ARRAY_LEN(small_circle_ids); i++) {
         if ((i & 31) != 0) {
             G_ADD_PE_ROPE (
@@ -207,7 +204,7 @@ int main()
                     small_circle_ids[i],
                 },
                 .length = fabric_length,
-                .restitution = fabric_restitution,
+                .strength = fabric_strength,
                 .break_force = 4.0,
             );
         }
@@ -219,7 +216,7 @@ int main()
                     small_circle_ids[i - 32],
                 },
                 .length = fabric_length,
-                .restitution = fabric_restitution,
+                .strength = fabric_strength,
                 .break_force = 4.0,
             );
         }
@@ -260,8 +257,8 @@ int main()
             g_rb_2d_get_id(repel_circle),
             g_rb_2d_get_id(player_circle),
         },
-        .length = 0.25f,
-        .restitution = 0.002f,
+        .length = -1.25f,
+        .strength = 0.012f,
     );
 
     for (u32 i = 0; i < 8; i++) {
@@ -271,7 +268,7 @@ int main()
                 g_rb_2d_get_id(player_circle),
             },
             .length = 0.25f,
-            .restitution = 2.0f,
+            .strength = 2.0f,
         );
     }
 
@@ -284,8 +281,10 @@ int main()
         r_clear();
         pe_debug_draw_grid(&cam);
         test_repel(repel_circle, player_circle, player, p_mouse(player));
-        pe_2d_tick();
-        g_tick_2d_rbs();
+        for (u32 i = 0; i < 2; i++) {
+            pe_2d_tick();
+            g_tick_2d_rbs();
+        }
         g_tick_players();
         cam.pos = player_circle->obj.pos;
         test_player_line(player_circle, repel_circle);

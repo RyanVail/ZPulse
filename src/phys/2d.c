@@ -156,7 +156,7 @@ static void pe_solve_intersection (
 
     const f32 force = overlap * PE_INTERSECTION_FIX_RATIO / combined_inv_mass;
 
-    const f32_v2 force_vec = f32_v2_mul(normal, f32_v2_splat(force));
+    const f32_v2 force_vec = f32_v2_scale(normal, force);
 
     const f32_v2 r0_old_pos = r0->obj.pos;
     const f32_v2 r1_old_pos = r1->obj.pos;
@@ -166,12 +166,12 @@ static void pe_solve_intersection (
 
     r0->obj.pos = f32_v2_sub (
         r0->obj.pos,
-        f32_v2_mul(force_vec, f32_v2_splat(o_rb_2d_inv_mass(r0)))
+        f32_v2_scale(force_vec, o_rb_2d_inv_mass(r0))
     );
 
     r1->obj.pos = f32_v2_add (
         r1->obj.pos,
-        f32_v2_mul(force_vec, f32_v2_splat(o_rb_2d_inv_mass(r1)))
+        f32_v2_scale(force_vec, o_rb_2d_inv_mass(r1))
     );
 
     pe_grid_rb_2d_move (
@@ -217,12 +217,12 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
         return;
 
     // TODO: Make sure this becomes a inv sqrt.
-    normal = f32_v2_mul(normal, f32_v2_splat(1.0f / sqrtf(dist_sqrd)));
+    normal = f32_v2_scale(normal, 1.0f / sqrtf(dist_sqrd));
 
     /* The point of the collision. */
     const f32_v2 pos = f32_v2_add (
         c0->obj.pos,
-        f32_v2_mul(normal, f32_v2_splat(o_rb_2d_circle_radius(c0)))
+        f32_v2_scale(normal, o_rb_2d_circle_radius(c0))
     );
 
     const f32_v2 p0 = f32_v2_sub(pos, c0->obj.pos);
@@ -274,7 +274,7 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
     force /= inv_mass + (p0_cross * p0_cross) * mat0->inv_inertia
         + (p1_cross * p1_cross) * mat1->inv_inertia;
 
-    const f32_v2 force_vec = f32_v2_mul(normal, f32_v2_splat(force));
+    const f32_v2 force_vec = f32_v2_scale(normal, force);
 
     o_rb_2d_apply_impact(c0, mat0->inv_inertia, f32_v2_neg(force_vec), p0);
     o_rb_2d_apply_impact(c1, mat1->inv_inertia, force_vec, p1);

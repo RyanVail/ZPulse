@@ -75,6 +75,11 @@ f32_v2 f32_v2_normalize(f32_v2 a);
 f32_v2 f32_v2_clamp(f32_v2 a, f32_v2 min, f32_v2 max);
 
 /**
+ * Scales a f32_v2 by a scalar value.
+ */
+f32_v2 f32_v2_scale(f32_v2 a, f32 scalar);
+
+/**
  * Checks if all elements in a f32_v2 are zeros.
  */
 bool f32_v2_is_zero(f32_v2 a);

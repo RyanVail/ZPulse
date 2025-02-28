@@ -36,7 +36,7 @@ void o_rb_2d_tick(o_rb_2d* rb)
         const f32 size = o_rb_2d_circle_radius(rb); // TODO: Should be generic.
 
         rb->obj.pos = f32_v2_add(rb->obj.pos, rb->vel);
-        rb->vel = f32_v2_mul(rb->vel, f32_v2_splat(1.0f - mat->air_res));
+        rb->vel = f32_v2_scale(rb->vel, 1.0f - mat->air_res);
 
         pe_grid_rb_2d_move (
             g_rb_2d_get_id(rb),
@@ -93,10 +93,7 @@ void o_rb_2d_apply_force(o_rb_2d* rb, f32_v2 force_vec)
 
     rb->vel = f32_v2_add (
         rb->vel,
-        f32_v2_mul (
-            force_vec,
-            f32_v2_splat(o_rb_2d_inv_mass(rb))
-        )
+        f32_v2_scale(force_vec, o_rb_2d_inv_mass(rb))
     );
 }
 
