@@ -5,6 +5,7 @@
 #include <game/obj_2d.h>
 #include <game/rb_2d.h>
 #include <assert.h>
+#include <math/angle.h>
 
 /**
  * Clears the render buffer.
@@ -47,15 +48,15 @@ void r_circle(const r_cam* cam, const o_2d* obj)
      * Rotating the points of the circle based on the rotation of the object.
      */
 #if R_CIRCLE_ROTATION
-    f32 ang = o_2d_ang(obj);
+    m_angle ang = o_2d_ang(obj);
 #else
-    f32 ang = 0.0;
+    m_angle ang = 0.0;
 #endif
 
     /* Caluclating the locations of the points. */
     for (size_t i = 0; i < ARRAY_LEN(points); i++) {
         ang += inc;
-        points[i] = f32_v2_rot(size, sinf(ang), cosf(ang));
+        points[i] = f32_v2_rot(size, m_sin(ang), m_cos(ang));
     }
 
     /* Setting the color of the object. */

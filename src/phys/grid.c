@@ -118,9 +118,8 @@ static u32 pe_grid_get_subgroup(u32 group, u32 depth, u32 quad)
         return groups[quad];
 
     /* Initializing a new group. */
-    if (depth == PE_GRID_GROUP_MAX_DEPTH) {
+    if (depth == PE_GRID_GROUP_MAX_DEPTH)
         return pe_grid_new_bodies(&groups[quad]);
-    }
 
     return pe_grid_new_group(&groups[quad]);
 }
@@ -190,6 +189,7 @@ static void pe_grid_rb_2d_add_to_bodies(pe_grid_bodies* bodies, g_rb_2d_id id)
 }
 
 static void pe_grid_rb_2d_remove_from_bodies (
+    u32* bodies_index,
     pe_grid_bodies* bodies,
     g_rb_2d_id id )
 {

@@ -4,6 +4,7 @@
 #include <math/vectors.h>
 #include <utils/color.h>
 #include <obj/sprite_2d.h>
+#include <math/angle.h>
 
 /* A 2D object. */
 typedef struct o_2d {
@@ -39,9 +40,9 @@ const o_sprite_2d* o_2d_sprite(const o_2d* obj);
 rgba8 o_2d_color(const o_2d* obj);
 
 /**
- * Calculates the angle of a 2D object.
+ * Calculates the angle in radians of a 2D object.
  */
-f32 o_2d_ang(const o_2d* obj);
+m_angle o_2d_ang(const o_2d* obj);
 
 /**
  * Calculates the sin of a 2D object's rotation.

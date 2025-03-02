@@ -25,11 +25,11 @@ rgba8 o_2d_color(const o_2d* obj)
 }
 
 /**
- * Calculates the angle of a 2D object.
+ * Calculates the angle, in radians, of a 2D object.
  */
-f32 o_2d_ang(const o_2d* obj)
+m_angle o_2d_ang(const o_2d* obj)
 {
-    return ((f32)obj->rot / 65535.0f) * (2 * (f32)M_PI);
+    return ((m_angle)obj->rot / 65535.0f) * (m_angle)(2 * M_PI);
 }
 
 /**

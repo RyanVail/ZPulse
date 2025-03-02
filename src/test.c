@@ -281,7 +281,7 @@ int main()
         r_clear();
         pe_debug_draw_grid(&cam);
         test_repel(repel_circle, player_circle, player, p_mouse(player));
-        for (u32 i = 0; i < 2; i++) {
+        for (u32 i = 0; i < PE_STEPS; i++) {
             pe_2d_tick();
             g_tick_2d_rbs();
         }

@@ -32,7 +32,8 @@ src = [
   'src/math/fu16_v2.c',
   'src/phys/grid.c',
   'src/phys/rope.c',
-  'src/math/u32.c'
+  'src/math/u32.c',
+  'src/math/angle.c',
 ]
 
 args = [
