@@ -189,7 +189,6 @@ static void pe_grid_rb_2d_add_to_bodies(pe_grid_bodies* bodies, g_rb_2d_id id)
 }
 
 static void pe_grid_rb_2d_remove_from_bodies (
-    u32* bodies_index,
     pe_grid_bodies* bodies,
     g_rb_2d_id id )
 {
