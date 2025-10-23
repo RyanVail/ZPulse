@@ -7,7 +7,8 @@
 #include <utils/vector.h>
 #include <obj/2d.h>
 #include <obj/rb_2d.h>
-#include <game/game.h>
+#include <game/init.h>
+#include <game/player.h>
 #include <game/grid.h>
 #include <player/player.h>
 #include <player/input.h>

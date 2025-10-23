@@ -1,12 +1,7 @@
-#ifndef GAME_GAME_H
-#define GAME_GAME_H
+#ifndef GAME_PLAYER_H
+#define GAME_PLAYER_H
 
 #include <player/player.h>
-
-/**
- * Inits the game.
- */
-void g_init();
 
 // TODO: There has to be a way to remove players too.
 /**

@@ -1,3 +1,4 @@
+#include <game/settings.h>
 #include <game/rb_2d.h>
 #include <phys/grid.h>
 
@@ -6,6 +7,12 @@ typeof(g_rb_2d_rects) g_rb_2d_rects;
 
 /* The global list of 2D circle rigid bodies. */
 typeof(g_rb_2d_circles) g_rb_2d_circles;
+
+void g_rbs_2d_init()
+{
+    VEC_INIT(g_rb_2d_rects, G_RB_2D_INIT_LEN);
+    VEC_INIT(g_rb_2d_circles, G_RB_2D_INIT_LEN);
+}
 
 // TODO: These functions shouldn't have _get_ in their names.
 o_rb_2d_type g_rb_2d_get_type(const o_rb_2d* rb)
