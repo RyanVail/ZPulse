@@ -1,8 +1,5 @@
 #include <utils/color.h>
 
-/**
- * Blends to colors together.
- */
 rgba8 rgba8_blend(const rgba8 a, const rgba8 b)
 {
     return (rgba8) {

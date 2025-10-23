@@ -2,9 +2,6 @@
 #include <math/f32_v2.h>
 #include <math/f32.h>
 
-/**
- * Solves a rope constraint.
- */
 static inline void pe_solve_rope(pe_rope* rope)
 {
     o_rb_2d* r0 = g_rb_2d_get(rope->bodies[0]);

@@ -57,18 +57,12 @@ static size_t pe_rect_circle_end = 0;
 /* The index in p_pairs_2d where circle and circle pairs end. */
 static size_t pe_circle_circle_end = 0;
 
-/**
- * Inits the 2D physics engine.
- */
 void pe_2d_init()
 {
     VEC_INIT(pe_pairs_2d, PE_2D_PAIRS_INIT_LEN);
 }
 
 #if 0
-/**
- * Finds pairs of possible collisions between circle rigid bodies.
- */
 void pe_find_circle_circle_pairs()
 {
     // TODO: Is there a better way to iterate?
@@ -122,9 +116,6 @@ static void pe_find_pairs_for (
     }
 }
 
-/**
- * Finds all of the 2D rigid body pairs of possible collisions.
- */
 void pe_find_pairs()
 {
     const pe_grid_flat_ids* ids = pe_grid_flatten();
@@ -191,9 +182,6 @@ static void pe_solve_intersection (
     );
 }
 
-/**
- * Solves the possible collision of two 2D circle rigid bodies.
- */
 void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
 {
     o_rb_2d_circle* c0 = &VEC_AT(g_rb_2d_circles, pair->circle_index);
@@ -280,18 +268,12 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
     o_rb_2d_apply_impact(c1, mat1->inv_inertia, force_vec, p1);
 }
 
-/**
- * Solve all the 2D circle rigid body pairs.
- */
 void pe_solve_circle_circle_pairs()
 {
     for (size_t i = pe_rect_rect_end; i < pe_circle_circle_end; i++)
         pe_solve_circle_circle(&VEC_AT(pe_pairs_2d, i).circle_circle);
 }
 
-/**
- * Solves all of the 2D rigid body pairs of possible collisions.
- */
 void pe_solve()
 {
     pe_solve_circle_circle_pairs();
@@ -302,9 +284,6 @@ void pe_solve()
     //VEC_SHRINK(pe_pairs_2d);
 }
 
-/**
- * Ticks the 2D physics engine.
- */
 void pe_2d_tick()
 {
     pe_find_pairs();

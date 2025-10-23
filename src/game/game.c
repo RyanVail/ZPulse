@@ -10,9 +10,6 @@
 static VEC(p_player) g_local_players;
 
 // TODO: This could be moved to game/init.c.
-/**
- * Inits the game.
- */
 void g_init()
 {
     VEC_INIT(g_objs_2d, G_OBJ_2D_INIT_LEN);
@@ -21,9 +18,6 @@ void g_init()
     VEC_INIT(g_rb_2d_circles, G_RB_2D_INIT_LEN);
 }
 
-/**
- * Adds a player to the global local player list.
- */
 p_player* g_add_player()
 {
     p_player* player = VEC_DRY_APPEND(g_local_players);
@@ -31,9 +25,6 @@ p_player* g_add_player()
     return player;
 }
 
-/**
- * Ticks all players in the local player list.
- */
 void g_tick_players()
 {
     for VEC_ITER(g_local_players, player)

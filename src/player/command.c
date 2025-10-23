@@ -1,12 +1,6 @@
 #include <player/command.h>
 #include <debug/debug.h>
 
-/**
- * Executes a command on a player.
- *
- * @param The player cannot be NULL.
- * @param command The command to execute on the player.
- */
 void p_execute(p_player* player, c_command command)
 {
     DEBUG_ASSERT (player != NULL,

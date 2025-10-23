@@ -22,18 +22,11 @@ static const c_command i_keyboard_default_unpress_map[I_KEYS] = {
     [I_KEY_D] = CE_LEFT,
 };
 
-/**
- * Saves the current input from a keyboard into the last input of the
- * controller.
- */
 void i_keyboard_save_last_keys(i_keyboard* keyboard)
 {
     memcpy(keyboard->last_keys, keyboard->keys, sizeof(keyboard->keys));
 }
 
-/**
- * Loads in the default map into a keyboard input processor.
- */
 void i_keyboard_load_default(i_keyboard* keyboard)
 {
     memcpy (

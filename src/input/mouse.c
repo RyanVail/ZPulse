@@ -19,17 +19,11 @@ static const c_command i_mouse_default_unpress_map[I_MOUSE_BUTTONS] = {
     [I_MOUSE_BUTTON_MIDDLE_CLICK] = C_NONE,
 };
 
-/**
- * Saves the current input from a mouse into the last input of the mouse.
- */
 void i_mouse_save_last_buttons(i_mouse* mouse)
 {
     memcpy(mouse->last_buttons, mouse->buttons, sizeof(mouse->buttons));
 }
 
-/**
- * Loads in the default map into a mouse input processor.
- */
 void i_mouse_load_default(i_mouse* mouse)
 {
     memcpy (

@@ -1,8 +1,5 @@
 #include <command/command.h>
 
-/**
- * Executes a command.
- */
 void c_execute(c_command command)
 {
     switch (command)

@@ -10,9 +10,6 @@ static pe_grid_flat_ids flat_ids_vec;
 
 #if DEBUG
 #include <render/render.h>
-/**
- * Draws the physics grid for debugging.
- */
 void pe_debug_draw_grid(const r_cam* cam)
 {
 #if 0

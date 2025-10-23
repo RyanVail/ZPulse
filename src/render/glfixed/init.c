@@ -3,19 +3,11 @@
 #include <render/init.h>
 #include <window/settings.h>
 
-/**
- * Resizes the OpenGL viewport when the window size changes.
- */
 void r_framebuffer_resize(UNUSED GLFWwindow* window, i32 width, i32 height)
 {
     glViewport(0, 0, width, height);
 }
 
-/**
- * Inits the renderer.
- *
- * @return An error code.
- */
 r_init_error r_init()
 {
     // TODO: A lot of this stuff with window initializing could be done inside

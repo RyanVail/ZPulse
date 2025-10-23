@@ -1,9 +1,6 @@
 #include <input/input.h>
 #include <debug/debug.h>
 
-/**
- * Reads input from an input processor.
- */
 void i_read(i_input* processor)
 {
     DEBUG_ASSERT (processor != NULL,

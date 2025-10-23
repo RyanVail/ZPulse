@@ -7,9 +7,6 @@
 #include <assert.h>
 #include <math/angle.h>
 
-/**
- * Clears the render buffer.
- */
 void r_clear()
 {
     // TODO: Make a background color setting.
@@ -17,9 +14,6 @@ void r_clear()
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-/**
- * Flushes the render buffer
- */
 void r_flush()
 {
     glfwSwapBuffers(glfw_window);
@@ -27,9 +21,6 @@ void r_flush()
 }
 
 // TODO: Implement textures again.
-/**
- * Renders a circle object to a camera.
- */
 void r_circle(const r_cam* cam, const o_2d* obj)
 {
     glBindTexture(GL_TEXTURE_2D, o_2d_tex(obj));
@@ -92,9 +83,6 @@ void r_circle(const r_cam* cam, const o_2d* obj)
     glEnd();
 }
 
-/**
- * Renders a rectangle object to a camera.
- */
 void r_rect(const r_cam* cam, const o_2d* obj)
 {
     /* Used to rotate the points around based on the objects rotation. */
@@ -143,9 +131,6 @@ void r_rect(const r_cam* cam, const o_2d* obj)
     glEnd();
 }
 
-/**
- * Renders a line to a camera.
- */
 void r_line(const r_cam* cam, f32_v2 start, f32_v2 end, const rgba8 color)
 {
     /* Shifting the start and end by the camera's position and zoom. */
@@ -159,9 +144,6 @@ void r_line(const r_cam* cam, f32_v2 start, f32_v2 end, const rgba8 color)
     glEnd();
 }
 
-/**
- * Renders a 2D object to a camera.
- */
 void r_obj_2d(const r_cam* cam, const o_2d* obj)
 {
     switch (o_2d_sprite(obj)->shape)
@@ -178,10 +160,6 @@ void r_obj_2d(const r_cam* cam, const o_2d* obj)
     }
 }
 
-/**
- * Renders all the 2D objects in the global 2D object list and all the objects
- * of the rigid bodies in the 2D global object lists to a camera.
- */
 void r_objs_2d(const r_cam* cam)
 {
     for VEC_ITER(g_objs_2d, obj)

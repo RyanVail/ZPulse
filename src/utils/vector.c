@@ -1,17 +1,6 @@
 #include <utils/vector.h>
 #include <math/u32.h>
 
-/**
- * Get a value from a vector at an index. This can compile with bounds checks
- * for debugging.
- *
- * @param vec The vector that is being indexed.
- * @param index The index of the desired element.
- * @param type_size The byte size of each element in vec.
- * @return A pointer to the element at the index.
- *
- * @warning Use "VEC_AT".
- */
 void* vector_at(vector* vec, size_t index, size_t type_size)
 {
     DEBUG_ASSERT (index <= vec->len,
@@ -26,32 +15,11 @@ void* vector_at(vector* vec, size_t index, size_t type_size)
     return vector_at_unsafe(vec, index, type_size);
 }
 
-/**
- * Get a value from a vector at an index. This will never use any kind of bound
- * checking.
- *
- * @param vec The vector that is being indexed.
- * @param index The index of the desired element.
- * @param type_size The byte size of each element in vec.
- * @return A pointer to the element at the index.
- * @note This function should only be used if the element at the desired index
- * is sure to be valid.
- *
- * @warning Use "VEC_AT_UNSAFE".
- */
 void* vector_at_unsafe(vector* vec, size_t index, size_t type_size)
 {
     return (void*)((size_t)vec->data + (type_size * index));
 }
 
-/**
- * Attempts to shrink a vector's size down to fit the len.
- *
- * @param vec The vector that is shrinking.
- * @param type_size The byte size of each elementss in vec.
- *
- * @warning Use "VEC_SHRINK".
- */
 void vector_shrink(vector* vec, size_t type_size)
 {
     DEBUG_ASSERT (vec->data != NULL,
@@ -70,14 +38,6 @@ void vector_shrink(vector* vec, size_t type_size)
     }
 }
 
-/**
- * Attempts to expand the size of the vector to fit the len of the vector.
- *
- * @param vec The vector that is being expanded.
- * @param type_size The byte size of each element in vec.
- *
- * @warning Use "VEC_EXPAND".
- */
 void vector_expand(vector* vec, size_t type_size)
 {
     if (((size_t)1 << vec->size) < vec->len * type_size) {
@@ -86,15 +46,6 @@ void vector_expand(vector* vec, size_t type_size)
     }
 }
 
-/**
- * Appends an element to the end of a vector.
- *
- * @param vec The vector that is being appended to.
- * @param value The value of the element that is being appended to vec.
- * @param type_size The byte size of each element in vec.
- *
- * @warning Use "VEC_APPEND".
- */
 void vector_append(vector* vec, const void* value, size_t type_size)
 {
     vec->len++;
@@ -107,15 +58,6 @@ void vector_append(vector* vec, const void* value, size_t type_size)
     );
 }
 
-/**
- * Expands the vector as if a value was going to be appeneded but doesn't
- * append a value so the value can be inited later.
- *
- * @param vec The vector to be dry appended to.
- * @return A pointer to the appended space.
- *
- * @warning Use "VEC_DRY_APPEND".
- */
 void* vector_dry_append(vector* vec, size_t type_size)
 {
     vec->len++;
@@ -123,16 +65,6 @@ void* vector_dry_append(vector* vec, size_t type_size)
     return vector_at(vec, vec->len - 1, type_size);
 }
 
-/**
- * Appends an element to the end of a vector without attempting to expand the
- * size of the vector.
- *
- * @param vec The vector that is being appended to.
- * @param value The value of the element that is being appended to vec.
- * @param type_size The byte size of each element in vec.
- *
- * @warning Use "VEC_APPEND_UNSAFE".
- */
 void vector_append_unsafe(vector* vec, void* value, size_t type_size)
 {
     memcpy (
@@ -144,14 +76,6 @@ void vector_append_unsafe(vector* vec, void* value, size_t type_size)
     vec->len++;
 }
 
-/**
- * Pops the last element of a vector.
- *
- * @param vec The vector that is being popped.
- * @param type_size The byte size of each element in vec.
- *
- * @warning Use "VEC_POP".
- */
 void vector_pop(vector* vec, size_t type_size)
 {
     DEBUG_ASSERT (vec->data != NULL,
@@ -163,15 +87,6 @@ void vector_pop(vector* vec, size_t type_size)
     vector_shrink(vec, type_size);
 }
 
-/**
- * Removes an element from a vector.
- *
- * @param vec The vector that is being removed from.
- * @param value A ptr to the element being removed.
- * @param type_size The byte size of each element in vec.
- *
- * @warning Use "VEC_REMOVE_PTR".
- */
 void vector_remove_ptr(vector* vec, void* value, size_t type_size)
 {
     DEBUG_ASSERT (vec->data != NULL,
@@ -187,27 +102,8 @@ void vector_remove_ptr(vector* vec, void* value, size_t type_size)
     vector_shrink(vec, type_size);
 }
 
-/**
- * Removes an element from a vector at a specific index.
- *
- * @param vec The vector that is being removed from.
- * @param index The index of the element that is being removed.
- * @param type_size The byte size of each element in vec.
- *
- * @warning Use "VEC_REMOVE".
- */
 void vector_remove(vector* vec, size_t index, size_t type_size);
 
-/**
- * Adds an element to a vector at a specific index.
- *
- * @param vec The vector that is being added to.
- * @param value The value of the element that is being added to vec.
- * @param index The index that the value is being added to.
- * @param type_size The byte size of each element in vec.
- * @return A pointer to the element that got added to the vec.
- * @note index must be less than or equal to the len of vec.
- */
 void* vector_add(vector* vec, void* value, size_t index, size_t type_size)
 {
     DEBUG_ASSERT (index <= vec->len,
@@ -231,15 +127,6 @@ void* vector_add(vector* vec, void* value, size_t index, size_t type_size)
     return target;
 }
 
-/**
- * Inits a vector that has enough space for the desired len.
- *
- * @param vec The vector that is being inited.
- * @param len The length that the vector should allocate enough bytes for.
- * @param type_size The byte size of each element in vec.
- *
- * @warning Use "VEC_INIT".
- */
 void vector_init(vector* vec, size_t len, size_t type_size)
 {
     /* The amount of size required. */
@@ -255,33 +142,12 @@ void vector_init(vector* vec, size_t len, size_t type_size)
     };
 }
 
-/**
- * Checks if a pointer points to a value within the data of a vector.
- *
- * @param vec The vector to check if the pointer is within.
- * @param ptr The pointer to check if inside the vector.
- * @param type_size The byte size of each element in the vector.
- * @return True if the pointer points to data inside the vector, otherwise
- * false.
- *
- * @warning Use "VEC_PTR_WITHIN".
- */
 bool vector_is_ptr_within(vector* vec, const void* ptr, size_t type_size)
 {
     return ((uintptr_t)ptr >= (uintptr_t)vec->data) 
         && (uintptr_t)ptr < (uintptr_t)vec->data + (vec->len * type_size);
 }
 
-/**
- * Gets the data index of a pointer that points inside a vector.
- *
- * @param vec The vector the pointer points inside of.
- * @param ptr The pointer to get the data index of.
- * @param type_size The byte size of each element in the vector.
- * @return The index of the data inside the vector the pointer points to.
- *
- * @warning Use "VEC_PTR_INDEX".
- */
 size_t vector_ptr_index(vector* vec, const void* ptr, size_t type_size)
 {
     DEBUG_ASSERT (vector_is_ptr_within(vec, ptr, type_size),

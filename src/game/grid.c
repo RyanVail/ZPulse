@@ -1,8 +1,5 @@
 #include <game/grid.h>
 
-/**
- * Snaps a point to a grid by flooring it.
- */
 f32_v2 g_grid_floor_snap(const g_grid* grid, const f32_v2 point)
 {
     return (f32_v2) {
@@ -11,9 +8,6 @@ f32_v2 g_grid_floor_snap(const g_grid* grid, const f32_v2 point)
     };
 }
 
-/**
- * Snaps a point to a grid.
- */
 f32_v2 g_grid_snap(const g_grid* grid, const f32_v2 point)
 {
     return (f32_v2) {

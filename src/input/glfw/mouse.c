@@ -1,9 +1,6 @@
 #include <input/mouse.h>
 #include <window/glfw.h>
 
-/**
- * Reads input from a mouse.
- */
 void i_mouse_read(i_mouse* mouse)
 {
     /* Reading the size of the window. */

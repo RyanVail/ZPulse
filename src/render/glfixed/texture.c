@@ -1,14 +1,6 @@
 #include <libs/glfw.h>
 #include <render/texture.h>
 
-/**
- * Creates a texture from an image.
- *
- * @raw The raw data of the image.
- * @param width The width of the image in pixels.
- * @param height The height of the image in pixels.
- * @return The id of the new texture.
- */
 r_tex r_tex_from_image(const u8* raw, u32 width, u32 height)
 {
     r_tex tex;
