@@ -19,6 +19,11 @@ f32 f32_clamp(f32 a, f32 min, f32 max);
 f32 f32_abs(f32 a);
 
 /**
+ * Calculates the maximum of two f32s.
+ */
+f32 f32_max(f32 a, f32 b);
+
+/**
  * Squares an f32 value.
  */
 f32 f32_sqr(f32 a);

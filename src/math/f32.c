@@ -19,6 +19,11 @@ f32 f32_abs(f32 a)
     return fabsf(a);
 }
 
+f32 f32_max(f32 a, f32 b)
+{
+    return fmaxf(a, b);
+}
+
 f32 f32_sqr(f32 a)
 {
     return a * a;

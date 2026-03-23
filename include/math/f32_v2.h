@@ -44,6 +44,16 @@ f32_v2 f32_v2_mul(f32_v2 a, f32_v2 b);
 f32_v2 f32_v2_div(f32_v2 a, f32_v2 b);
 
 /**
+ * Computes the inverse of all elements of a f32_v2.
+ */
+f32_v2 f32_v2_inv(f32_v2 a);
+
+/**
+ * Adds `c` to the result of multiplying `a` and `b`.
+ */
+f32_v2 f32_v2_fmadd(f32_v2 a, f32_v2 b, f32_v2 c);
+
+/**
  * Rotates a point represented by a f32_v2 around the origin based on the sin
  * and cos of the angle to rotate by.
  *

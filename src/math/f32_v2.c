@@ -54,6 +54,22 @@ f32_v2 f32_v2_div(f32_v2 a, f32_v2 b)
     };
 }
 
+f32_v2 f32_v2_inv(f32_v2 a)
+{
+    return (f32_v2) {
+        .x = 1.0f / a.x,
+        .y = 1.0f / a.y
+    };
+}
+
+f32_v2 f32_v2_fmadd(f32_v2 a, f32_v2 b, f32_v2 c)
+{
+    return (f32_v2) {
+        .x = (a.x * b.x) + c.x,
+        .y = (a.y * b.y) + c.y
+    };
+}
+
 f32_v2 f32_v2_rot(f32_v2 point, f32 sin, f32 cos)
 {
     return (f32_v2) {
