@@ -2,8 +2,14 @@
 #include <math/f32_v2.h>
 #include <math/f32.h>
 
-static inline void pe_solve_rope(pe_rope* rope)
+bool pe_rope_is_spring(const pe_rope* rope)
 {
+    return rope->strength < 0.0;
+}
+
+bool pe_rope_solve(const pe_rope* rope)
+{
+    const bool spring = pe_rope_is_spring(rope);
     o_rb_2d* r0 = g_rb_2d_get(rope->bodies[0]);
     o_rb_2d* r1 = g_rb_2d_get(rope->bodies[1]);
 
@@ -15,35 +21,46 @@ static inline void pe_solve_rope(pe_rope* rope)
     const f32 dist_sqrd = f32_v2_mag_sqrd(dif);
     const f32 rope_len_sqrd = f32_sqr(rope->length);
 
-    bool negative = dist_sqrd < rope_len_sqrd;
+    const bool negative = dist_sqrd < rope_len_sqrd;
 
     f32 strength = rope->strength;
     if (negative) {
-        if (rope->length < 0) {
+        if (spring) {
             strength = -strength;
         } else {
-            return;
+            return false;
         }
     }
 
-    f32 force = f32_sqrt(dist_sqrd / rope_len_sqrd) * strength;
+    const f32 dist = f32_sqrt(dist_sqrd);
+
+    f32 force;
+    if (spring) {
+        force = (rope->length / dist) * strength;
+    } else {
+        force = (dist / rope->length) * strength;
+    }
+
+    if (f32_abs(force >= rope->break_force)) {
+        return false;
+    }
 
     const f32 force_cap = rope->strength * PE_ROPE_MAX_FORCE_FACTOR;
     force = f32_clamp(force, -force_cap, force_cap);
 
     force /= o_rb_2d_inv_mass(r0) + o_rb_2d_inv_mass(r1);
 
-    // TODO: Remove rope.
-    //if (f32_abs(force >= rope->break_force)
-
     const f32_v2 force_vec = f32_v2_scale(dif, force);
 
     o_rb_2d_apply_force(r0, f32_v2_neg(force_vec));
     o_rb_2d_apply_force(r1, force_vec);
+
+    return true;
 }
 
 void pe_rope_tick()
 {
+    // TODO: This should be breaking the rope.
     for VEC_ITER(g_pe_ropes, rope)
-        pe_solve_rope(rope);
+        (void)pe_rope_solve(rope);
 }

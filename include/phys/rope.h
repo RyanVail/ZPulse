@@ -30,7 +30,17 @@ typedef struct pe_rope {
 } pe_rope;
 
 /**
- * Ticks the rope constraints within the 2D physics engine.
+ * Checks if a rope constraint should act like a spring.
+ */
+bool pe_rope_is_spring(const pe_rope* rope);
+
+/**
+ * Solves a rope constraint.
+ */
+bool pe_rope_solve(const pe_rope* rope);
+
+/**
+ * Solves all the rope constraints within the 2D physics engine.
  */
 void pe_rope_tick();
 

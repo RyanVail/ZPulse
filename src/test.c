@@ -128,7 +128,6 @@ void test_player_line (
         (const rgba8) { 0, 0, 0, 0 }
     );
 #endif
-
 }
 
 int main()
@@ -195,8 +194,9 @@ int main()
     }
 
     /* Connection the circles in a fabric pattern. */
-    const f32 fabric_length = 0.225f;
-    const f32 fabric_strength = 0.5f;
+    const f32 fabric_length = 0.025f;
+    const f32 fabric_strength = 0.025f;
+    const f32 fabric_break_force = 0.25f;
     for (u32 i = 0; i < ARRAY_LEN(small_circle_ids); i++) {
         if ((i & 31) != 0) {
             G_ADD_PE_ROPE (
@@ -206,7 +206,7 @@ int main()
                 },
                 .length = fabric_length,
                 .strength = fabric_strength,
-                .break_force = 4.0,
+                .break_force = fabric_break_force,
             );
         }
 
@@ -218,7 +218,7 @@ int main()
                 },
                 .length = fabric_length,
                 .strength = fabric_strength,
-                .break_force = 4.0,
+                .break_force = fabric_break_force,
             );
         }
     }
@@ -269,7 +269,7 @@ int main()
                 g_rb_2d_get_id(player_circle),
             },
             .length = 0.25f,
-            .strength = 2.0f,
+            .strength = 0.005f,
         );
     }
 
