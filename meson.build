@@ -49,12 +49,15 @@ largs = [
   '-lGLU',
   '-lglfw',
   '-lX11',
-  '-lXxf86vm',
   '-lXrandr',
   '-lpthread',
   '-lXi',
   '-lm',
 ]
+
+if build_machine.cpu_family() in [ 'x86_64', 'x86' ]
+    largs += [ '-lXxf86vm' ]
+endif
 
 incdir = include_directories('include')
 
