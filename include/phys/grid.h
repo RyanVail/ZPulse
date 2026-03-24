@@ -10,6 +10,23 @@
 #define PE_GRID_RB_DEPTH_UP G_RB_2D_ID_NULL
 #define PE_GRID_RB_DEPTH_DOWN (G_RB_2D_ID_NULL - 1)
 
+#define PE_GRID_TOP_QUAD 0
+#define PE_GRID_BOT_QUAD 1
+#define PE_GRID_VERT_MASK 1
+
+#define PE_GRID_LEFT_QUAD 2
+#define PE_GRID_RIGHT_QUAD 0
+#define PE_GRID_HORZ_MASK 2
+
+/*
+ * The indicies of the four groups in a `pe_grid_group` based on their
+ * positions.
+ */
+#define PE_GRID_TOP_LEFT_GROUP (PE_GRID_TOP_QUAD | PE_GRID_LEFT_QUAD)
+#define PE_GRID_TOP_RIGHT_GROUP (PE_GRID_TOP_QUAD | PE_GRID_RIGHT_QUAD)
+#define PE_GRID_BOT_LEFT_GROUP (PE_GRID_BOT_QUAD | PE_GRID_LEFT_QUAD)
+#define PE_GRID_BOT_RIGHT_GROUP (PE_GRID_BOT_QUAD | PE_GRID_RIGHT_QUAD)
+
 static_assert (G_RB_2D_ID_NULL == UINT32_MAX,
     "Physics grid needs G_RB_2D_ID_NULL to be null"
 );
@@ -45,8 +62,8 @@ extern struct {
     VEC(pe_grid_group) groups;
     VEC(pe_grid_bodies) bodies;
 
-    u32 first_empty_group;
-    u32 first_empty_bodies;
+    u32 first_free_group;
+    u32 first_free_bodies;
 } pe_grid;
 
 /*
@@ -96,5 +113,10 @@ void pe_grid_rb_2d_move (
  * function is called again.
  */
 const pe_grid_flat_ids* pe_grid_flatten();
+
+/**
+ * Cleans unusued structures in the physics grid.
+ */
+void pe_grid_clean();
 
 #endif

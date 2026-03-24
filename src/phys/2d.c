@@ -246,7 +246,7 @@ void pe_solve_circle_circle(const pe_circle_circle_pair_2d* pair)
         1.0f - (f32_sqrt(dist_sqrd / radius_sqrd))
     );
 
-    /* Don't do anything impact processing if the objects are seperating. */
+    /* Don't do any impact processing if the objects are seperating. */
     if (vel_along_norm > 0)
         return;
 
@@ -289,4 +289,7 @@ void pe_2d_tick()
     pe_find_pairs();
     pe_solve();
     pe_rope_tick();
+
+    // TODO: This should go somewhere else.
+    pe_grid_clean();
 }
