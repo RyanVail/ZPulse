@@ -2,6 +2,7 @@
 #include <window/glfw.h>
 #include <render/init.h>
 #include <window/settings.h>
+#include <render/glfixed.h>
 
 void r_framebuffer_resize(UNUSED GLFWwindow* window, i32 width, i32 height)
 {
@@ -31,6 +32,8 @@ r_init_error r_init()
     glfwSetFramebufferSizeCallback(glfw_window, r_framebuffer_resize);
 
     glEnable(GL_TEXTURE_2D);
+
+    r_circle_init();
 
     return R_INIT_ERROR_NONE;
 }
