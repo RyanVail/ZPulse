@@ -72,16 +72,6 @@ extern struct {
  */
 typedef VEC(g_rb_2d_id) pe_grid_flat_ids;
 
-// TODO: There should be another file in the headers called debug.h for debug
-// things because this is just bad.
-#if DEBUG
-#include <render/camera.h>
-/**
- * Draws the physics grid for debugging.
- */
-void pe_debug_draw_grid(const r_cam* cam);
-#endif
-
 /**
  * Gets the grid bodies group for a position and size.
  *

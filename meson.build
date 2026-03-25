@@ -42,6 +42,7 @@ args = [
   '-Wall',
   '-Wno-override-init',
   '-Og',
+  '-g',
 ]
 
 largs = [

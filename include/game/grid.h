@@ -1,4 +1,4 @@
-#ifndef GAME_GIRD_H
+#ifndef GAME_GRID_H
 #define GAME_GRID_H
 
 #include <math/f32_v2.h>

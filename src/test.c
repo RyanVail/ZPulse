@@ -18,6 +18,7 @@
 #include <phys/init.h>
 #include <phys/mat.h>
 #include <phys/grid.h>
+#include <phys/debug.h>
 #include <render/camera.h>
 #include <math/f32.h>
 #include <window/settings.h>
@@ -120,14 +121,15 @@ void test_player_line (
     const o_rb_2d_circle* player_circle,
     const o_rb_2d_circle* repel_circle )
 {
-#if DEBUG
+    if (!DEBUG)
+        return;
+
     r_line (
         &cam,
         player_circle->obj.pos,
         repel_circle->obj.pos,
         (const rgba8) { 0, 0, 0, 0 }
     );
-#endif
 }
 
 int main()

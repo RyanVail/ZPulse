@@ -1,7 +1,9 @@
 #include <phys/grid.h>
+#include <phys/debug.h>
 #include <math/u32.h>
 #include <math/f32.h>
 #include <assert.h>
+#include <render/render.h>
 
 /* The global grid. */
 typeof(pe_grid) pe_grid;
@@ -134,9 +136,6 @@ static bool pe_grid_group_try_free(u32 group, u32 depth)
     return can_free;
 }
 
-#if DEBUG
-#include <render/render.h>
-
 // TODO: This should cull the groups that aren't in the camera's FOV.
 static void pe_debug_draw_grid_group(
     const r_cam* cam,
@@ -206,6 +205,9 @@ static void pe_debug_draw_grid_group(
 
 void pe_debug_draw_grid(const r_cam* cam)
 {
+    if (!DEBUG)
+        return;
+
     pe_debug_draw_grid_group (
         cam,
         0,
@@ -214,7 +216,6 @@ void pe_debug_draw_grid(const r_cam* cam)
         (f32)PE_GRID_SIZE
     );
 }
-#endif
 
 /**
  * Adds a new group to the physics grid.
@@ -356,7 +357,7 @@ static void pe_grid_rb_2d_remove_from_bodies (
 
         DEBUG_ASSERT (bodies->next_group != UINT32_MAX,
             "Couldn't find object id when removing object from physics grid"
-        )
+        );
 
         bodies = &VEC_AT(pe_grid.bodies, bodies->next_group);
     }

@@ -1,7 +1,12 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#define DEBUG true
-#define MULTITHREADED true
+#ifndef DEBUG
+    #define DEBUG true
+#endif
+
+#ifndef MULTITHREADED
+    #define MULTITHREADED true
+#endif
 
 #endif
