@@ -6,30 +6,33 @@
 #include <render/render.h>
 
 /* The global grid. */
-typeof(pe_grid) pe_grid;
+struct {
+    VEC(pe_grid_group) groups;
+    VEC(pe_grid_bodies) bodies;
 
+    pe_grid_group_id first_free_group;
+    pe_grid_bodies_id first_free_bodies;
+} pe_grid;
+
+/*
+ * A flat version of the physics grid quad tree. *PE_GRID_RB_DEPTH_UP* and
+ * *PE_GRID_RB_DEPTH_DOWN* denote changes in depth.
+ */
 static pe_grid_flat_ids flat_ids_vec;
 
 /**
  * Gets the offset of a quad from it's group parent.
  */
-static f32_v2 pe_grid_quad_offset(u32 quad_index, f32 size)
+static f32_v2 pe_grid_quad_offset(pe_grid_quad quad, f32 size)
 {
-    f32_v2 offset;
-
-    if ((quad_index & PE_GRID_VERT_MASK) == PE_GRID_TOP_QUAD) {
-        offset.y = size;
-    } else {
-        offset.y = -size;
+    switch (quad)
+    {
+    case PE_GRID_QUAD_TOP_LEFT:  return (f32_v2) { -size, size };
+    case PE_GRID_QUAD_TOP_RIGHT: return (f32_v2) {  size,  size };
+    case PE_GRID_QUAD_BOT_LEFT:  return (f32_v2) { -size, -size };
+    case PE_GRID_QUAD_BOT_RIGHT: return (f32_v2) {  size, -size };
+    default: UNREACHABLE();
     }
-
-    if ((quad_index & PE_GRID_HORZ_MASK) == PE_GRID_RIGHT_QUAD) {
-        offset.x = size;
-    } else {
-        offset.x = -size;
-    }
-
-    return offset;
 }
 
 /**
@@ -37,10 +40,10 @@ static f32_v2 pe_grid_quad_offset(u32 quad_index, f32 size)
  *
  * @warning This will not free the sub bodies of this set.
  */
-static void pe_grid_bodies_free(u32 index, pe_grid_bodies* bodies)
+static void pe_grid_bodies_free(pe_grid_bodies_id id, pe_grid_bodies* bodies)
 {
-    bodies->next_group = pe_grid.first_free_bodies;
-    pe_grid.first_free_bodies = index;
+    bodies->next = pe_grid.first_free_bodies;
+    pe_grid.first_free_bodies = id;
 }
 
 /**
@@ -49,23 +52,23 @@ static void pe_grid_bodies_free(u32 index, pe_grid_bodies* bodies)
  * @warning This will not free the sub groups of this group or the linked
  * bodies in this group.
  */
-static void pe_grid_group_free(u32 index, pe_grid_group* group)
+static void pe_grid_group_free(pe_grid_group_id id, pe_grid_group* group)
 {
-    group->groups[0] = pe_grid.first_free_group;
-    pe_grid.first_free_group = index;
+    group->quads[0] = pe_grid.first_free_group;
+    pe_grid.first_free_group = id;
 }
 
 /**
  * Attempts to free a set of bodies in the physics grid.
  *
  * @param bodies A pointer to the index of the set of bodies. If the value at
- * the pointer is `UINT32_MAX` this will return true.
+ * the pointer is null this will return true.
  * @return True if freed, false otherwise.
  */
-static bool pe_grid_bodies_try_free(u32* bodies)
+static bool pe_grid_bodies_try_free(pe_grid_bodies_id* bodies)
 {
     while (true) {
-        if (*bodies == UINT32_MAX)
+        if (*bodies == PE_GRID_BODIES_ID_NULL)
             return true;
 
         pe_grid_bodies* data = &VEC_AT(pe_grid.bodies, *bodies);
@@ -76,10 +79,10 @@ static bool pe_grid_bodies_try_free(u32* bodies)
         }
 
         /* Removing the bodies set from the linked list. */
-        const u32 old_index = *bodies;
-        *bodies = data->next_group;
+        const pe_grid_bodies_id old_id = *bodies;
+        *bodies = data->next;
 
-        pe_grid_bodies_free(old_index, data);
+        pe_grid_bodies_free(old_id, data);
     }
 
     return true;
@@ -91,39 +94,31 @@ static bool pe_grid_bodies_try_free(u32* bodies)
  *
  * @return True if freed, false otherwise.
  */
-static bool pe_grid_group_try_free(u32 group, u32 depth)
+static bool pe_grid_group_try_free(pe_grid_group_id group, u32 depth)
 {
     bool can_free = true;
     pe_grid_group* data = &VEC_AT(pe_grid.groups, group);
 
     /* This group can't be freed if it contains bodies. */
-    for (size_t i = 0; i < PE_GRID_GROUP_RB_LEN; i++) {
-        if (data->bodies.rbs[i] != G_RB_2D_ID_NULL) {
-            can_free = false;
-            break;
-        }
-    }
-
-    /* Trying to free the sub bodies of the bodies set. */
-    if (!pe_grid_bodies_try_free(&data->bodies.next_group))
+    if (!pe_grid_bodies_try_free(&data->bodies))
         can_free = false;
 
     /* Trying to free the sub groups. */
-    for (size_t i = 0; i < 4; i++) {
-        u32* index = &data->groups[i];
+    for (size_t i = 0; i < PE_GRID_QUADS; i++) {
+        pe_grid_bodies_id* id = &data->quads[i];
 
-        if (*index == UINT32_MAX)
+        if (*id == PE_GRID_BODIES_ID_NULL)
             continue;
 
         if (depth == PE_GRID_GROUP_MAX_DEPTH) {
-            if (pe_grid_bodies_try_free(index)) {
-                *index = UINT32_MAX;
+            if (pe_grid_bodies_try_free(id)) {
+                *id = PE_GRID_GROUP_ID_NULL;
             } else {
                 can_free = false;
             }
         } else {
-            if (pe_grid_group_try_free(*index, depth + 1)) {
-                *index = UINT32_MAX;
+            if (pe_grid_group_try_free(*id, depth + 1)) {
+                *id = PE_GRID_GROUP_ID_NULL;
             } else {
                 can_free = false;
             }
@@ -139,7 +134,7 @@ static bool pe_grid_group_try_free(u32 group, u32 depth)
 // TODO: This should cull the groups that aren't in the camera's FOV.
 static void pe_debug_draw_grid_group(
     const r_cam* cam,
-    u32 group,
+    pe_grid_group_id group,
     u32 depth,
     f32_v2 pos,
     f32 size )
@@ -159,29 +154,29 @@ static void pe_debug_draw_grid_group(
 
     r_line (
         cam,
-        (const f32_v2) { pos.x - scaled_half, pos.y + scaled_half },
-        (const f32_v2) { pos.x - scaled_half, pos.y - scaled_half },
+        (f32_v2) { pos.x - scaled_half, pos.y + scaled_half },
+        (f32_v2) { pos.x - scaled_half, pos.y - scaled_half },
         color
     );
 
     r_line (
         cam,
-        (const f32_v2) { pos.x - scaled_half, pos.y - scaled_half },
-        (const f32_v2) { pos.x + scaled_half, pos.y - scaled_half },
+        (f32_v2) { pos.x - scaled_half, pos.y - scaled_half },
+        (f32_v2) { pos.x + scaled_half, pos.y - scaled_half },
         color
     );
 
     r_line (
         cam,
-        (const f32_v2) { pos.x + scaled_half, pos.y + scaled_half },
-        (const f32_v2) { pos.x + scaled_half, pos.y - scaled_half },
+        (f32_v2) { pos.x + scaled_half, pos.y + scaled_half },
+        (f32_v2) { pos.x + scaled_half, pos.y - scaled_half },
         color
     );
 
     r_line (
         cam,
-        (const f32_v2) { pos.x + scaled_half, pos.y + scaled_half },
-        (const f32_v2) { pos.x - scaled_half, pos.y + scaled_half },
+        (f32_v2) { pos.x + scaled_half, pos.y + scaled_half },
+        (f32_v2) { pos.x - scaled_half, pos.y + scaled_half },
         color
     );
 
@@ -190,11 +185,11 @@ static void pe_debug_draw_grid_group(
 
     /* Drawing the subgroups. */
     const pe_grid_group data = VEC_AT(pe_grid.groups, group);
-    for (u32 i = 0; i < 4; i++) {
-        if (data.groups[i] != UINT32_MAX) {
+    for (size_t i = 0; i < PE_GRID_QUADS; i++) {
+        if (data.quads[i] != PE_GRID_GROUP_ID_NULL) {
             pe_debug_draw_grid_group (
                 cam,
-                data.groups[i],
+                data.quads[i],
                 depth + 1,
                 f32_v2_add(pos, pe_grid_quad_offset(i, half)),
                 half
@@ -217,80 +212,66 @@ void pe_debug_draw_grid(const r_cam* cam)
     );
 }
 
-/**
- * Adds a new group to the physics grid.
- *
- * @param index_dest A pointer to the location where the index of the group
- * should be written before any pointers to groups become invalid.
- * @return The index of the group.
- *
- * @warning Any pointers to groups become invalid after this function is
- * called.
- */
-u32 pe_grid_new_group(u32* index_dest)
+static pe_grid_group_id pe_grid_new_group(pe_grid_group_id* id_dest)
 {
-    const u32 index = pe_grid.groups.len;
-    *index_dest = index;
+    const pe_grid_group_id id = (pe_grid_group_id)pe_grid.groups.len;
+    *id_dest = id;
 
     pe_grid_group* group = VEC_DRY_APPEND(pe_grid.groups);
-    // TODO: This is bad.
-    memset(group, 255, sizeof(*group));
-    return index;
+
+    /* Initing the group. */
+    group->bodies = PE_GRID_BODIES_ID_NULL;
+    for (size_t i = 0; i < PE_GRID_QUADS; i++) {
+        group->quads[i] = PE_GRID_GROUP_ID_NULL;
+    }
+
+    return id;
 }
 
-/**
- * Adds a new group of bodies to the physics grid.
- *
- * @param index_dest A pointer to the location where the index of the bodies
- * should be written before any pointers to bodies become invalid.
- * @return The group of bodies index.
- *
- * @warning Any pointers to bodies become invalid after this function is
- * called.
- */
-u32 pe_grid_new_bodies(u32* index_dest)
+static pe_grid_bodies_id pe_grid_new_bodies(pe_grid_bodies_id* id_dest)
 {
-    const u32 index = pe_grid.bodies.len;
-    *index_dest = index;
+    const pe_grid_bodies_id id = (pe_grid_bodies_id)pe_grid.bodies.len;
+    *id_dest = id;
 
     pe_grid_bodies* bodies = VEC_DRY_APPEND(pe_grid.bodies);
-    // TODO: This is bad.
-    memset(bodies, 255, sizeof(*bodies));
-    return index;
+
+    /* Initing the bodies. */
+    bodies->next = PE_GRID_BODIES_ID_NULL;
+    for (size_t i = 0; i < PE_GRID_GROUP_RB_LEN; i++) {
+        bodies->rbs[i] = G_RB_2D_ID_NULL;
+    }
+
+    return id;
 }
 
 /**
- * Gets the sub group of a group at a specified quad index. If the sub group
- * is null this will init it.
+ * Gets a sub quad of a group. If the quad is null this will init it.
  */
-static u32 pe_grid_get_subgroup(u32 group, u32 depth, u32 quad)
+static pe_grid_group_id pe_grid_get_subgroup(
+    pe_grid_group_id id,
+    u32 depth,
+    pe_grid_quad quad )
 {
-    u32* groups = VEC_AT(pe_grid.groups, group).groups;
-    if (groups[quad] != UINT32_MAX)
-        return groups[quad];
+    pe_grid_group* group = &VEC_AT(pe_grid.groups, id);
+    if (group->quads[quad] != PE_GRID_GROUP_ID_NULL)
+        return group->quads[quad];
 
     /* Initializing a new group. */
     if (depth == PE_GRID_GROUP_MAX_DEPTH)
-        return pe_grid_new_bodies(&groups[quad]);
+        return pe_grid_new_bodies(&group->quads[quad]);
 
-    return pe_grid_new_group(&groups[quad]);
+    return pe_grid_new_group(&group->quads[quad]);
 }
 
-/**
- * Gets the grid bodies group for a position and size.
- *
- * @warning All pointers to bodies within the physics grid become invalid after
- * calling this function.
- */
-pe_grid_bodies* pe_grid_get_bodies(const f32_v2 pos, f32 size)
+pe_grid_bodies* pe_grid_get_bodies(f32_v2 pos, f32 size)
 {
     f32_v2 mid = f32_v2_splat(0.0f);
     f32 half = PE_GRID_SIZE * 0.5f;
 
-    u32 group = 0;
+    pe_grid_group_id group = 0;
     for (u32 depth = 0; depth <= PE_GRID_GROUP_MAX_DEPTH; depth++) {
-        /* The index of the quad the origin of this rigid body is in. */
-        u32 quad = 0;
+        /* The quad the origin of the rigid body is inside. */
+        pe_grid_quad quad = 0;
 
         if (pos.x > mid.x) {
             mid.x += half;
@@ -319,7 +300,14 @@ pe_grid_bodies* pe_grid_get_bodies(const f32_v2 pos, f32 size)
         half *= 0.5f;
     }
 
-    return &VEC_AT(pe_grid.groups, group).bodies;
+    pe_grid_group* group_ptr = &VEC_AT(pe_grid.groups, group);
+
+    pe_grid_bodies_id bodies = group_ptr->bodies;
+    if (bodies == PE_GRID_BODIES_ID_NULL) {
+        bodies = pe_grid_new_bodies(&group_ptr->bodies);
+    }
+
+    return &VEC_AT(pe_grid.bodies, group_ptr->bodies);
 }
 
 static void pe_grid_rb_2d_add_to_bodies(pe_grid_bodies* bodies, g_rb_2d_id id)
@@ -332,13 +320,13 @@ static void pe_grid_rb_2d_add_to_bodies(pe_grid_bodies* bodies, g_rb_2d_id id)
             }
         }
 
-        if (bodies->next_group == UINT32_MAX) {
-            const u32 next_group = pe_grid_new_bodies(&bodies->next_group);
-            VEC_AT(pe_grid.bodies, next_group).rbs[0] = id;
+        if (bodies->next == PE_GRID_BODIES_ID_NULL) {
+            const pe_grid_group_id next = pe_grid_new_bodies(&bodies->next);
+            VEC_AT(pe_grid.bodies, next).rbs[0] = id;
             return;
         }
 
-        bodies = &VEC_AT(pe_grid.bodies, bodies->next_group);
+        bodies = &VEC_AT(pe_grid.bodies, bodies->next);
     }
 }
 
@@ -355,31 +343,24 @@ static void pe_grid_rb_2d_remove_from_bodies (
             }
         }
 
-        DEBUG_ASSERT (bodies->next_group != UINT32_MAX,
+        DEBUG_ASSERT (bodies->next != PE_GRID_BODIES_ID_NULL,
             "Couldn't find object id when removing object from physics grid"
         );
 
-        bodies = &VEC_AT(pe_grid.bodies, bodies->next_group);
+        bodies = &VEC_AT(pe_grid.bodies, bodies->next);
     }
 }
 
-/**
- * Adds a 2D rigid body to the physics grid.
- */
-void pe_grid_rb_2d_add(g_rb_2d_id id, const f32_v2 pos, f32 size)
+void pe_grid_rb_2d_add(g_rb_2d_id id, f32_v2 pos, f32 size)
 {
     pe_grid_rb_2d_add_to_bodies(pe_grid_get_bodies(pos, size), id);
 }
 
-/**
- * If required, moves a 2D rigid body in the physics grid after a size and or a
- * position change.
- */
 void pe_grid_rb_2d_move (
     g_rb_2d_id id,
-    const f32_v2 old_pos,
+    f32_v2 old_pos,
     f32 old_size,
-    const f32_v2 new_pos,
+    f32_v2 new_pos,
     f32 new_size )
 {
     /*
@@ -407,11 +388,11 @@ static void pe_grid_flatten_bodies(const pe_grid_bodies* bodies)
             if (bodies->rbs[i] != G_RB_2D_ID_NULL)
                 VEC_APPEND(flat_ids_vec, &bodies->rbs[i]);
 
-        if (bodies->next_group == UINT32_MAX)
+        if (bodies->next == PE_GRID_BODIES_ID_NULL)
             break;
 
         /* Adding the rbs in the next bodies group. */
-        bodies = &VEC_AT(pe_grid.bodies, bodies->next_group);
+        bodies = &VEC_AT(pe_grid.bodies, bodies->next);
     }
 }
 
@@ -421,20 +402,22 @@ static void pe_grid_flatten_bodies(const pe_grid_bodies* bodies)
 static void pe_grid_flatten_group(const pe_grid_group* group, u32 depth)
 {
     /* Adding the bodies within this group to the vec. */
-    pe_grid_flatten_bodies(&group->bodies);
+    if (group->bodies != PE_GRID_BODIES_ID_NULL) {
+        pe_grid_flatten_bodies(&VEC_AT(pe_grid.bodies, group->bodies));
+    }
 
     /* Flattening this group's sub groups. */
-    for (size_t i = 0; i < ARRAY_LEN(group->groups); i++) {
-        if (group->groups[i] == UINT32_MAX)
+    for (size_t i = 0; i < PE_GRID_QUADS; i++) {
+        if (group->quads[i] == PE_GRID_GROUP_ID_NULL)
             continue;
 
         *VEC_DRY_APPEND(flat_ids_vec) = PE_GRID_RB_DEPTH_DOWN;
 
         if (depth == PE_GRID_GROUP_MAX_DEPTH) {
-            pe_grid_flatten_bodies(&VEC_AT(pe_grid.bodies, group->groups[i]));
+            pe_grid_flatten_bodies(&VEC_AT(pe_grid.bodies, group->quads[i]));
         } else {
             pe_grid_flatten_group (
-                &VEC_AT(pe_grid.groups, group->groups[i]),
+                &VEC_AT(pe_grid.groups, group->quads[i]),
                 depth + 1
             );
         }
@@ -443,12 +426,6 @@ static void pe_grid_flatten_group(const pe_grid_group* group, u32 depth)
     }
 }
 
-/**
- * Flattens the physics quad tree into a single vector.
- *
- * @warning The vector returned by this function is valid up until this
- * function is called again.
- */
 const pe_grid_flat_ids* pe_grid_flatten()
 {
     flat_ids_vec.len = 0;
@@ -461,18 +438,15 @@ void pe_grid_clean()
     pe_grid_group_try_free(0, 0);
 }
 
-/**
- * Inits the physics engine's grid.
- */
 void pe_grid_init()
 {
     // TODO: Choose a real number.
     VEC_INIT(pe_grid.groups, 4);
     VEC_INIT(pe_grid.bodies, 4);
     VEC_INIT(flat_ids_vec, 128);
-    pe_grid.first_free_group = UINT32_MAX;
-    pe_grid.first_free_bodies = UINT32_MAX;
+    pe_grid.first_free_group = PE_GRID_GROUP_ID_NULL;
+    pe_grid.first_free_bodies = PE_GRID_BODIES_ID_NULL;
 
-    u32 unused;
+    pe_grid_group_id unused;
     pe_grid_new_group(&unused);
 }
