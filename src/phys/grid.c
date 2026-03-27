@@ -139,12 +139,6 @@ static void pe_debug_draw_grid_group(
     f32_v2 pos,
     f32 size )
 {
-    const f32 inv_scale = cam->zoom.y;
-    const f32 scale = 1.0f / inv_scale;
-
-    const f32 half = size * 0.5f;
-    const f32 scaled_half = half * scale;
-
     const rgba8 color = {
         ((depth * 2910) & 255) / 2,
         ((depth * 3943) & 255) / 2,
@@ -154,29 +148,29 @@ static void pe_debug_draw_grid_group(
 
     r_line (
         cam,
-        (f32_v2) { pos.x - scaled_half, pos.y + scaled_half },
-        (f32_v2) { pos.x - scaled_half, pos.y - scaled_half },
+        (f32_v2) { pos.x - size, pos.y + size },
+        (f32_v2) { pos.x - size, pos.y - size },
         color
     );
 
     r_line (
         cam,
-        (f32_v2) { pos.x - scaled_half, pos.y - scaled_half },
-        (f32_v2) { pos.x + scaled_half, pos.y - scaled_half },
+        (f32_v2) { pos.x - size, pos.y - size },
+        (f32_v2) { pos.x + size, pos.y - size },
         color
     );
 
     r_line (
         cam,
-        (f32_v2) { pos.x + scaled_half, pos.y + scaled_half },
-        (f32_v2) { pos.x + scaled_half, pos.y - scaled_half },
+        (f32_v2) { pos.x + size, pos.y + size },
+        (f32_v2) { pos.x + size, pos.y - size },
         color
     );
 
     r_line (
         cam,
-        (f32_v2) { pos.x + scaled_half, pos.y + scaled_half },
-        (f32_v2) { pos.x - scaled_half, pos.y + scaled_half },
+        (f32_v2) { pos.x + size, pos.y + size },
+        (f32_v2) { pos.x - size, pos.y + size },
         color
     );
 
@@ -191,8 +185,8 @@ static void pe_debug_draw_grid_group(
                 cam,
                 data.quads[i],
                 depth + 1,
-                f32_v2_add(pos, pe_grid_quad_offset(i, half)),
-                half
+                f32_v2_add(pos, pe_grid_quad_offset(i, size * 0.5f)),
+                size * 0.5f
             );
         }
     }
