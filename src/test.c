@@ -1,5 +1,4 @@
 #include <libs/glfw.h>
-#include <libs/stb_image.h>
 #include <render/init.h>
 #include <render/render.h>
 #include <render/texture.h>
@@ -23,6 +22,8 @@
 #include <math/f32.h>
 #include <window/settings.h>
 #include <game/pe_rope.h>
+#include <utils/io.h>
+#include <qoi.h>
 
 static r_cam cam;
 
@@ -144,31 +145,46 @@ int main()
     pe_init();
     o_sprite_2d_init();
 
-    u32 width;
-    u32 height;
-    UNUSED u32 channels;
-    u8* raw = stbi_load (
-        "../tests/test.tga",
-        (i32*)&width,
-        (i32*)&height,
-        (i32*)&channels,
-        0
+    qoi_image test_img;
+
+    size_t test_img_len;
+    u8* test_img_data = io_read_file("../tests/test.qoi", &test_img_len);
+    if (test_img_data == NULL) {
+        fprintf(stderr, "Failed to read test image file\n");
+        exit(-1);
+    }
+
+    const bool img_success = qoi_decode(
+        &test_img,
+        test_img_data,
+        test_img_len
     );
 
-    if (raw == NULL)
-        fprintf(stderr, "Failed to load test image\n");
+    if (!img_success) {
+        fprintf(stderr, "Failed to decode test image file\n");
+        exit(-1);
+    }
+
+    free(test_img_data);
 
     cam = (r_cam) {
         .pos = { 0.0f, 0.0f },
         .zoom = { 0.5f * W_RATIO, 0.5f },
     };
 
-    r_tex test_tex = r_tex_from_image(raw, width, height);
-    o_sprite_id_2d test_sprite = O_ADD_SPRITE (
-        .tex = test_tex,
-        .color = (const rgba8) { 255, 128, 255, 0 },
+    r_tex test_tex = r_tex_from_image(
+        (const u8*)test_img.pixels,
+        test_img.width,
+        test_img.height
     );
-    stbi_image_free(raw);
+
+    free(test_img.pixels);
+
+    o_sprite_id_2d test_sprite = O_ADD_SPRITE (
+        .shape = R_SHAPE_RECT,
+        .tex = test_tex,
+        .color = (const rgba8) { 255, 255, 255, 0 },
+    );
 
     mouse_circle_id = O_ADD_SPRITE (
         .color = (const rgba8) { 255, 128, 128, 0 },

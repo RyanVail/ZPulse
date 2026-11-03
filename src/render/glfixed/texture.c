@@ -13,7 +13,7 @@ r_tex r_tex_from_image(const u8* raw, u32 width, u32 height)
         width,
         height,
         0,
-        GL_RGB,
+        GL_RGBA,
         GL_UNSIGNED_BYTE,
         raw
     );
